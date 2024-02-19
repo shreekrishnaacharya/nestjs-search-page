@@ -1,9 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
 import { IPageable } from "./pageable.interface";
 import { Sort } from "./sort.model";
-import { ISortable } from "./sortable.interface";
-import { SortDirection } from "../enums/response-status.enum";
-import { PageDto } from "./page.dto";
+import { ISortable, SortDirection } from "./sortable.interface";
+
+interface IPage {
+  _start: number
+  _end: number
+  _sort: string
+  _order: SortDirection
+}
 
 export class PageRequest implements IPageable {
   public skip: number;
@@ -32,8 +36,8 @@ export class PageRequest implements IPageable {
     return this.sort;
   }
 
-  public static from(pageDto: PageDto): IPageable {
-    let { _sort, _order, _start, _end } = pageDto
+  public static from(page: IPage): IPageable {
+    let { _sort, _order, _start, _end } = page
     if (!_start) {
       _start = 0;
     }
@@ -42,5 +46,5 @@ export class PageRequest implements IPageable {
     }
     const pageSize = _end - _start;
     return new PageRequest(_start, pageSize, Sort.from(_sort, _order));
-  } 
+  }
 }

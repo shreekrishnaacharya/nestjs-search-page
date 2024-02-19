@@ -1,16 +1,14 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { SortDirection } from "../enums/response-status.enum";
-import { ISortable } from "./sortable.interface";
+
+import { ISortable, SortDirection } from "./sortable.interface";
+
 
 export class Sort implements ISortable {
-  @ApiProperty({ required: false })
-  public direction: string;
-  @ApiProperty({ required: false })
+  public direction: SortDirection;
   public column: string;
 
   constructor(
     column: string = "createdAt",
-    direction: string = SortDirection.DESCENDING
+    direction: SortDirection = "DESC"
   ) {
     this.direction = direction;
     this.column = column;
@@ -46,7 +44,7 @@ export class Sort implements ISortable {
     return result
   }
 
-  public static from(column: string, direction: string): ISortable {
+  public static from(column: string, direction: SortDirection): ISortable {
     return new Sort(column, direction);
   }
 }

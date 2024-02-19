@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "declaration": true,
+        "module": "ESNext",
+        "target": "ES2016",
+        "allowJs": true,
+        "moduleResolution": "node",
+        "sourceMap": false,
+        "outDir": "./publish/"
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "lib": [
+        "es5",
+        "es6",
+        "dom",
+        "dom.iterable"
+    ]
+}
