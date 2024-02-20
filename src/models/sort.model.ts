@@ -1,5 +1,6 @@
+import { SortDirection } from "../constants";
+import { ISortable } from "../interfaces";
 
-import { ISortable, SortDirection } from "./sortable.interface";
 
 
 export class Sort implements ISortable {

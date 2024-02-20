@@ -1,7 +1,6 @@
 import { Repository } from "typeorm";
 import { Page } from "../models/page.model";
-import { IPageable } from "../models/pageable.interface";
-import { IPageSearch } from "../constants";
+import { IPageSearch, IPageable } from "../interfaces";
 export declare class CommonEntity<T> {
     private readonly _currentRepo;
     constructor(_currentRepo: Repository<T>);

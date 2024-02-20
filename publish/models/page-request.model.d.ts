@@ -1,11 +1,4 @@
-import { IPageable } from "./pageable.interface";
-import { ISortable, SortDirection } from "./sortable.interface";
-interface IPage {
-    _start: number;
-    _end: number;
-    _sort: string;
-    _order: SortDirection;
-}
+import { IPage, IPageable, ISortable } from "../interfaces";
 export declare class PageRequest implements IPageable {
     skip: number;
     take: number;
@@ -16,4 +9,3 @@ export declare class PageRequest implements IPageable {
     getSort(): ISortable;
     static from(page: IPage): IPageable;
 }
-export {};

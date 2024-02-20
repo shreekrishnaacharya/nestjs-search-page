@@ -3,7 +3,6 @@
     "version": "1.1",
     "description": "@sksharma72000/nestjs-search-page is a nestjs typeorm framework for mysql. It consist of library and tools that will let you quickly handle sql related operation writing less code for you so you can focus on your business logic.",
     "main": "dist/index.js",
-    "type": "module",
     "keywords": ["easy "],
     "scripts": {
         "build": "npx tsc -b"

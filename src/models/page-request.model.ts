@@ -1,13 +1,5 @@
-import { IPageable } from "./pageable.interface";
+import { IPage, IPageable, ISortable } from "../interfaces";
 import { Sort } from "./sort.model";
-import { ISortable, SortDirection } from "./sortable.interface";
-
-interface IPage {
-  _start: number
-  _end: number
-  _sort: string
-  _order: SortDirection
-}
 
 export class PageRequest implements IPageable {
   public skip: number;

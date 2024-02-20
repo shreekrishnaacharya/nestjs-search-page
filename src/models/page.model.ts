@@ -1,4 +1,4 @@
-import { IPageable } from "./pageable.interface";
+import { IPageable } from "../interfaces";
 
 export class Page<T> {
   public elements: T[];

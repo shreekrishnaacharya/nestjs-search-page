@@ -12,8 +12,8 @@ import {
   Not
 } from "typeorm";
 import { Page } from "../models/page.model";
-import { IPageable } from "../models/pageable.interface";
-import { IPageSearch, Operation, Operator, PAGE_SEARCH } from "../constants";
+import { Operation, Operator, PAGE_SEARCH } from "../constants";
+import { IPageSearch, IPageable } from "../interfaces";
 
 type TWhere = { [key: string]: Array<any> }
 

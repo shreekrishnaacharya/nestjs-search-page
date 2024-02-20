@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,9 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Like, Equal, MoreThan, MoreThanOrEqual, LessThan, LessThanOrEqual, Not } from "typeorm";
-import { PAGE_SEARCH } from "../constants";
-export class CommonEntity {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CommonEntity = void 0;
+const typeorm_1 = require("typeorm");
+const constants_1 = require("../constants");
+class CommonEntity {
     constructor(_currentRepo) {
         this._currentRepo = _currentRepo;
     }
@@ -44,7 +47,7 @@ export class CommonEntity {
     _getMetaQuery(whereConditions, conditions, metaQuery) {
         let relational = {};
         for (const key in metaQuery) {
-            const pageSearch = Reflect.getMetadata(PAGE_SEARCH, metaQuery, key);
+            const pageSearch = Reflect.getMetadata(constants_1.PAGE_SEARCH, metaQuery, key);
             if (pageSearch) {
                 if (pageSearch.is_relational) {
                     relational = this._buildRelation(relational, pageSearch);
@@ -117,21 +120,22 @@ export class CommonEntity {
     _switchContition(operation, value) {
         switch (operation) {
             case "gt":
-                return MoreThan(value);
+                return (0, typeorm_1.MoreThan)(value);
             case "gteq":
-                return MoreThanOrEqual(value);
+                return (0, typeorm_1.MoreThanOrEqual)(value);
             // case "in":
             //   return In(value)
             case "like":
-                return Like(`%${value}%`);
+                return (0, typeorm_1.Like)(`%${value}%`);
             case "lt":
-                return LessThan(value);
+                return (0, typeorm_1.LessThan)(value);
             case "lteq":
-                return LessThanOrEqual(value);
+                return (0, typeorm_1.LessThanOrEqual)(value);
             case "neq":
-                return Not(Equal(value));
+                return (0, typeorm_1.Not)((0, typeorm_1.Equal)(value));
             default:
                 return value;
         }
     }
 }
+exports.CommonEntity = CommonEntity;

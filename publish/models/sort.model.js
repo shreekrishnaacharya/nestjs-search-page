@@ -1,4 +1,7 @@
-export class Sort {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Sort = void 0;
+class Sort {
     constructor(column = "createdAt", direction = "DESC") {
         this.direction = direction;
         this.column = column;
@@ -33,3 +36,4 @@ export class Sort {
         return new Sort(column, direction);
     }
 }
+exports.Sort = Sort;

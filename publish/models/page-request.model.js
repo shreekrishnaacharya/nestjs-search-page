@@ -1,6 +1,9 @@
-import { Sort } from "./sort.model";
-export class PageRequest {
-    constructor(skip = 0, take = 100, sort = new Sort()) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PageRequest = void 0;
+const sort_model_1 = require("./sort.model");
+class PageRequest {
+    constructor(skip = 0, take = 100, sort = new sort_model_1.Sort()) {
         this.skip = skip;
         this.take = take;
         this.sort = sort;
@@ -23,6 +26,7 @@ export class PageRequest {
             _end = 10;
         }
         const pageSize = _end - _start;
-        return new PageRequest(_start, pageSize, Sort.from(_sort, _order));
+        return new PageRequest(_start, pageSize, sort_model_1.Sort.from(_sort, _order));
     }
 }
+exports.PageRequest = PageRequest;

@@ -2,10 +2,10 @@
     "compilerOptions": {
         "esModuleInterop": true,
         "declaration": true,
-        "module": "ESNext",
-        "target": "ES2016",
+        "module": "Node16",
+        "target": "ES2015",
         "allowJs": true,
-        "moduleResolution": "node",
+        "moduleResolution": "Node16",
         "sourceMap": false,
         "outDir": "./publish/"
     },

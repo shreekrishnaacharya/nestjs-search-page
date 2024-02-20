@@ -1,4 +1,5 @@
-import { IPageSearch, PAGE_SEARCH } from "../constants";
+import { PAGE_SEARCH } from "../constants";
+import { IPageSearch } from "../interfaces";
 
 
 export function PageSearch(options?: IPageSearch) {
