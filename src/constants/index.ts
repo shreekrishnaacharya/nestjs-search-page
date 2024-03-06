@@ -5,4 +5,7 @@ export type Operation = "eq" | "neq" | "gt" | "gteq" | "lt" | "lteq" | "like"
 
 export type Operator = "and" | "or"
 
-export type SortDirection = "ASC" | "DESC"
+export enum SortDirection {
+    ASC = "ASC",
+    DESC = "DESC"
+}

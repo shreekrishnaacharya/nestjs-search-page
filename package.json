@@ -1,16 +1,22 @@
 {
     "name": "@sksharma72000/nestjs-search-page",
-    "version": "1.1",
+    "version": "1.2.7",
     "description": "@sksharma72000/nestjs-search-page is a nestjs typeorm framework for mysql. It consist of library and tools that will let you quickly handle sql related operation writing less code for you so you can focus on your business logic.",
     "main": "dist/index.js",
-    "keywords": ["easy "],
+    "keywords": [
+        "easy "
+    ],
     "scripts": {
         "build": "npx tsc -b"
     },
     "author": "Shree Krishna Acharya",
     "license": "MIT",
     "dependencies": {
-        "@nestjs/typeorm": "^10.0.1"
+        "@nestjs/typeorm": "^10.0.1",
+        "mysql2": "^2.3.3",
+        "@nestjs/class-validator": "^0.13.4",
+        "class-validator": "^0.14.0",
+        "class-transformer": "^0.5.1"
     },
     "devDependencies": {
         "@types/mysql": "^2.15.21",

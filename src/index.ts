@@ -1,6 +1,6 @@
 import { PageSearch } from "./decorators"
-import { PageRequest, Page, CommonEntity } from "./models"
-import { IPageable } from "./interfaces"
+import { Page, CommonEntity } from "./models"
+import { IPage, IPageSearch } from "./interfaces"
 
 
-export { PageSearch, CommonEntity, Page, PageRequest, IPageable }
+export { PageSearch, CommonEntity, Page, IPage, IPageSearch }

@@ -8,8 +8,8 @@ export class Sort implements ISortable {
   public column: string;
 
   constructor(
-    column: string = "createdAt",
-    direction: SortDirection = "DESC"
+    column: string = "id",
+    direction: SortDirection = SortDirection.DESC
   ) {
     this.direction = direction;
     this.column = column;

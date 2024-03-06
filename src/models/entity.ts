@@ -13,7 +13,8 @@ import {
 } from "typeorm";
 import { Page } from "../models/page.model";
 import { Operation, Operator, PAGE_SEARCH } from "../constants";
-import { IPageSearch, IPageable } from "../interfaces";
+import { IPage, IPageSearch, IPageable } from "../interfaces";
+import { PageRequest } from "./page-request.model";
 
 type TWhere = { [key: string]: Array<any> }
 
@@ -25,14 +26,14 @@ interface IBuildReturn {
 export class CommonEntity<T> {
   constructor(private readonly _currentRepo: Repository<T>) { }
   public async findAllByPage(
-    pageable: IPageable,
+    page: IPage,
     queryDto?: Object,
     customQuery?: IPageSearch[]
   ): Promise<Page<T>> {
+    const pageable: IPageable = PageRequest.from(page);
     let whereCondition = { and: [], or: [] } as TWhere;
     const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
     const { where: whereRaw, relations } = this._getMetaQuery(whereCondition, customQuery, queryDto)
-    console.log(whereRaw)
     const options: FindManyOptions<T> = {
       where: whereRaw as unknown as FindOptionsWhere<T>,
       order: sort as unknown as FindOptionsOrder<T>,
@@ -61,11 +62,14 @@ export class CommonEntity<T> {
     for (const key in metaQuery) {
       const pageSearch: IPageSearch = Reflect.getMetadata(PAGE_SEARCH, metaQuery, key);
       if (pageSearch) {
-        if (pageSearch.is_relational) {
+        if (pageSearch.column.includes(".")) {
+          pageSearch.is_nested = pageSearch?.is_nested ?? true;
+        }
+        pageSearch.value = metaQuery[key]
+        if ((pageSearch.value == true && pageSearch.is_relational == null) || pageSearch.is_relational == true) {
           relational = this._buildRelation(relational, pageSearch);
           continue;
         }
-        pageSearch.value = metaQuery[key]
         if (typeof pageSearch.value === "string" && pageSearch.value.toString() === "") {
           console.log("skipped :", pageSearch.value)
           continue;
@@ -74,7 +78,14 @@ export class CommonEntity<T> {
       }
     }
     conditions?.forEach((pageSearch: IPageSearch) => {
-      this._buildWhere(pageSearch, whereConditions)
+      if (pageSearch.column.includes(".")) {
+        pageSearch.is_nested = pageSearch?.is_nested ?? true;
+      }
+      if ((pageSearch.value == true && pageSearch.is_relational != false) || pageSearch.is_relational == true) {
+        relational = this._buildRelation(relational, pageSearch);
+      } else {
+        this._buildWhere(pageSearch, whereConditions)
+      }
     });
     let whereArray: Array<TWhere> = [];
     whereConditions.or.forEach(element => {
