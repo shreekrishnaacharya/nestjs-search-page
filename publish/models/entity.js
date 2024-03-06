@@ -12,17 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommonEntity = void 0;
 const typeorm_1 = require("typeorm");
 const constants_1 = require("../constants");
+const page_request_model_1 = require("./page-request.model");
 class CommonEntity {
     constructor(_currentRepo) {
         this._currentRepo = _currentRepo;
     }
-    findAllByPage(pageable, queryDto, customQuery) {
+    findAllByPage(page, queryDto, customQuery) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
+            const pageable = page_request_model_1.PageRequest.from(page);
             let whereCondition = { and: [], or: [] };
             const sort = (_a = pageable.getSort()) === null || _a === void 0 ? void 0 : _a.asKeyValue();
             const { where: whereRaw, relations } = this._getMetaQuery(whereCondition, customQuery, queryDto);
-            console.log(whereRaw);
             const options = {
                 where: whereRaw,
                 order: sort,
@@ -45,15 +46,19 @@ class CommonEntity {
         });
     }
     _getMetaQuery(whereConditions, conditions, metaQuery) {
+        var _a, _b;
         let relational = {};
         for (const key in metaQuery) {
             const pageSearch = Reflect.getMetadata(constants_1.PAGE_SEARCH, metaQuery, key);
             if (pageSearch) {
-                if (pageSearch.is_relational) {
+                if ((_a = pageSearch.column) === null || _a === void 0 ? void 0 : _a.includes(".")) {
+                    pageSearch.is_nested = (_b = pageSearch === null || pageSearch === void 0 ? void 0 : pageSearch.is_nested) !== null && _b !== void 0 ? _b : true;
+                }
+                pageSearch.value = metaQuery[key];
+                if ((pageSearch.value == true && pageSearch.is_relational == null) || pageSearch.is_relational == true) {
                     relational = this._buildRelation(relational, pageSearch);
                     continue;
                 }
-                pageSearch.value = metaQuery[key];
                 if (typeof pageSearch.value === "string" && pageSearch.value.toString() === "") {
                     console.log("skipped :", pageSearch.value);
                     continue;
@@ -62,7 +67,16 @@ class CommonEntity {
             }
         }
         conditions === null || conditions === void 0 ? void 0 : conditions.forEach((pageSearch) => {
-            this._buildWhere(pageSearch, whereConditions);
+            var _a, _b;
+            if ((_a = pageSearch.column) === null || _a === void 0 ? void 0 : _a.includes(".")) {
+                pageSearch.is_nested = (_b = pageSearch === null || pageSearch === void 0 ? void 0 : pageSearch.is_nested) !== null && _b !== void 0 ? _b : true;
+            }
+            if ((pageSearch.value == true && pageSearch.is_relational != false) || pageSearch.is_relational == true) {
+                relational = this._buildRelation(relational, pageSearch);
+            }
+            else {
+                this._buildWhere(pageSearch, whereConditions);
+            }
         });
         let whereArray = [];
         whereConditions.or.forEach(element => {
@@ -94,6 +108,9 @@ class CommonEntity {
     }
     _buildRelation(relational, pageSearch) {
         const { column, is_nested } = pageSearch;
+        if (!column) {
+            return relational;
+        }
         if (is_nested) {
             const nested = this._recursiveNestedObject(column.split("."), true);
             relational = Object.assign(Object.assign({}, relational), nested);
@@ -107,6 +124,9 @@ class CommonEntity {
         let i = 0;
         let cond = {};
         const { column, is_nested, operation, operator, value } = pageSearch;
+        if (!column) {
+            return whereConditions;
+        }
         if (is_nested) {
             const nested = column.split('.');
             const nestValue = this._switchContition(operation !== null && operation !== void 0 ? operation : 'like', value);

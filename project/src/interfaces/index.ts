@@ -1,7 +1,7 @@
 import { Operation, Operator, SortDirection } from "../constants"
 
 export interface IPageSearch {
-    is_relational?: boolean
+    is_relational?: boolean|null
     column?: string
     is_nested?: boolean
     operation?: Operation

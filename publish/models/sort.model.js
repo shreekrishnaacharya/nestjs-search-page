@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Sort = void 0;
+const constants_1 = require("../constants");
 class Sort {
-    constructor(column = "createdAt", direction = "DESC") {
+    constructor(column = "id", direction = constants_1.SortDirection.DESC) {
         this.direction = direction;
         this.column = column;
     }

@@ -7,7 +7,7 @@
         "easy "
     ],
     "scripts": {
-        "build": "npx tsc -b"
+        "build": "npx tsc -b && cp release/* ../publish/"
     },
     "author": "Shree Krishna Acharya",
     "license": "MIT",

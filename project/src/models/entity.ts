@@ -62,7 +62,7 @@ export class CommonEntity<T> {
     for (const key in metaQuery) {
       const pageSearch: IPageSearch = Reflect.getMetadata(PAGE_SEARCH, metaQuery, key);
       if (pageSearch) {
-        if (pageSearch.column.includes(".")) {
+        if (pageSearch.column?.includes(".")) {
           pageSearch.is_nested = pageSearch?.is_nested ?? true;
         }
         pageSearch.value = metaQuery[key]
@@ -78,7 +78,7 @@ export class CommonEntity<T> {
       }
     }
     conditions?.forEach((pageSearch: IPageSearch) => {
-      if (pageSearch.column.includes(".")) {
+      if (pageSearch.column?.includes(".")) {
         pageSearch.is_nested = pageSearch?.is_nested ?? true;
       }
       if ((pageSearch.value == true && pageSearch.is_relational != false) || pageSearch.is_relational == true) {
@@ -122,8 +122,12 @@ export class CommonEntity<T> {
     const [key, ...rest] = column
     return { [key]: this._recursiveNestedObject(rest, value) }
   }
+
   private _buildRelation(relational: object, pageSearch: IPageSearch) {
     const { column, is_nested } = pageSearch
+    if (!column) {
+      return relational;
+    }
     if (is_nested) {
       const nested = this._recursiveNestedObject(column.split("."), true);
       relational = {
@@ -140,6 +144,9 @@ export class CommonEntity<T> {
     let i = 0;
     let cond = {};
     const { column, is_nested, operation, operator, value } = pageSearch
+    if (!column) {
+      return whereConditions;
+    }
     if (is_nested) {
       const nested = column.split('.');
       const nestValue = this._switchContition(operation ?? 'like', value)
