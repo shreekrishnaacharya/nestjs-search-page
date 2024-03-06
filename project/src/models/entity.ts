@@ -66,7 +66,7 @@ export class CommonEntity<T> {
           pageSearch.is_nested = pageSearch?.is_nested ?? true;
         }
         pageSearch.value = metaQuery[key]
-        if ((pageSearch.value == true && pageSearch.is_relational == null) || pageSearch.is_relational == true) {
+        if ((pageSearch.value === true && pageSearch.is_relational === null) || pageSearch.is_relational === true) {
           relational = this._buildRelation(relational, pageSearch);
           continue;
         }
@@ -81,7 +81,7 @@ export class CommonEntity<T> {
       if (pageSearch.column?.includes(".")) {
         pageSearch.is_nested = pageSearch?.is_nested ?? true;
       }
-      if ((pageSearch.value == true && pageSearch.is_relational != false) || pageSearch.is_relational == true) {
+      if ((pageSearch.value === true && pageSearch.is_relational !== false) || pageSearch.is_relational === true) {
         relational = this._buildRelation(relational, pageSearch);
       } else {
         this._buildWhere(pageSearch, whereConditions)
