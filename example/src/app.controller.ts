@@ -7,10 +7,9 @@ import {
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { PagableDto } from './dtos/pagable.dto';
-import { PageRequest, IPageable } from '@sksharma72000/nestjs-search-page'
 import { CommentSearchDto } from './dtos/comment.search.dto';
 
-@Controller()
+@Controller("comments")
 export class AppController {
   constructor(private readonly commentService: CommentService) { }
 

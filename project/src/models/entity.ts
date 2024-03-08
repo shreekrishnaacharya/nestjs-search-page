@@ -12,7 +12,7 @@ import {
   Not
 } from "typeorm";
 import { Page } from "../models/page.model";
-import { Operation, Operator, PAGE_SEARCH } from "../constants";
+import { Operation, PAGE_SEARCH } from "../constants";
 import { IPage, IPageSearch, IPageable } from "../interfaces";
 import { PageRequest } from "./page-request.model";
 

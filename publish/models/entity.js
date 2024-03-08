@@ -55,7 +55,7 @@ class CommonEntity {
                     pageSearch.is_nested = (_b = pageSearch === null || pageSearch === void 0 ? void 0 : pageSearch.is_nested) !== null && _b !== void 0 ? _b : true;
                 }
                 pageSearch.value = metaQuery[key];
-                if ((pageSearch.value == true && pageSearch.is_relational == null) || pageSearch.is_relational == true) {
+                if ((pageSearch.value === true && pageSearch.is_relational === null) || pageSearch.is_relational === true) {
                     relational = this._buildRelation(relational, pageSearch);
                     continue;
                 }
@@ -71,7 +71,7 @@ class CommonEntity {
             if ((_a = pageSearch.column) === null || _a === void 0 ? void 0 : _a.includes(".")) {
                 pageSearch.is_nested = (_b = pageSearch === null || pageSearch === void 0 ? void 0 : pageSearch.is_nested) !== null && _b !== void 0 ? _b : true;
             }
-            if ((pageSearch.value == true && pageSearch.is_relational != false) || pageSearch.is_relational == true) {
+            if ((pageSearch.value === true && pageSearch.is_relational !== false) || pageSearch.is_relational === true) {
                 relational = this._buildRelation(relational, pageSearch);
             }
             else {

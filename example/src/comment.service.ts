@@ -20,9 +20,4 @@ export class CommentService extends CommonEntity<Comment> {
   ): Promise<Page<Comment>> {
     return this.findAllByPage(pagable, commentDto);
   }
-
-  // createComment(commentCreateDto:CommentCreateDto):Promish<Comment>{
-  //   const createComment=this.commentRepository.create({...commentCreateDto})
-  //   return await this.commentRepository.save(createComment)
-  // }
 }

@@ -9,7 +9,7 @@ export class CommentSearchDto {
         as long as you set column attribute PageSearch of you can give any name to dto attribute.
     */
     @IsOptional()
-    @PageSearch({ column: "post.title", is_nested: true })
+    @PageSearch({ column: "post.title" })
     post_title: string
 
     /* 
@@ -17,7 +17,7 @@ export class CommentSearchDto {
     */
     @IsOptional()
     @Type(() => Boolean)
-    @PageSearch({ is_relational: true })
+    @PageSearch()
     post: boolean
 
     /* 
@@ -26,7 +26,7 @@ export class CommentSearchDto {
     */
     @IsOptional()
     @Type(() => Number)
-    @PageSearch({ operation: 'eq', operator: 'and' })
+    @PageSearch({ operation: "eq", operator: "and" })
     post_id: number
 
     /* 
