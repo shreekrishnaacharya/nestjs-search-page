@@ -21,7 +21,7 @@
    You can define your custom data transfer object defining your quering attributes.
    Your quering attributes are the table column where your query keyword would be search.
    @PageSearch decorator accept IPageSearch interface object.
-    ```bash
+    ```
     interface IPageSearch {
         is_relational?: boolean;
         column?: string;
@@ -31,17 +31,19 @@
         value?: string | number | boolean | null;
     }
     ```
-    *is_relational*: Indicate if the attribute is relational. ie this will extract the relational table of current table\
-                      and add to your response. Default value is false.\
+    *is_relational*: Indicate if the attribute is relational. If attribute value type is boolen, \
+                    then also the current attribute is taken relational unless is_relational is set to false.\
+                    ie this will extract the relational table of current table and add to your response. Default value is null.\
 \
     *column*: Name of table's column where your want to query. Default value is the name of the attribute.\
 \
-    *is_nested*: Indicate if current quering attribute is of relational table column. when this options is set to true.\
-                    column option must be define indicating the relational table name and column name saperated by dot.
-                    Default is false.\
+    *is_nested*: Indicate if current quering attribute is of relational table column. If the column name \
+                    consist of dot ie '.' then the attribute is taken nested. When this options is set to true, \
+                    column option must be define indicating the relational table name and column name \
+                    saperated by dot. Default is false.\
                     Example : \
                     ```
-                    {column:"post.title",is_nested:true}
+                    {column:"post.title"}
                     ```
 \
 \
@@ -93,74 +95,155 @@
     }
     ```
 4. findAllByPage\
-    Once you have extends CommonEntity in your service. You can call findAllByPage method as `this.findAllByPage`. findAllByPage takes three arguments ie first IPage, second your dto with @PageSearch decorated attribute, and custom IPageSearch List. Here 1st and 2nd argument are required and 3rd is optional. You can pass your IPage dto as 1st argument, your custom dto with @PageSearch decorated attribute as second argument and you can add additional query condition to your pagination with the third argument. This method returns Promise of type `Page`.
+    Once you have extends CommonEntity in your service. You can call findAllByPage method as `this.findAllByPage`. findAllByPage takes three arguments ie first IPage, second your dto with @PageSearch decorated attribute, and custom IPageSearch List. Here 1st and 2nd argument are required and 3rd is optional. You can pass your IPage dto as 1st argument, your custom dto with @PageSearch decorated attribute as second argument and you can add additional query condition of type IPageSearch to your pagination with the third argument. This method returns Promise of type `Page`.
     Example of Page
+    ```
+        export declare interface Page<T> {
+            elements: T[];
+            totalElements: number;
+            pagable: IPageable;
+        }
+    ```
 
-
-
-1. Update your service by extending CommonEntity
+\
+This is how your CommentService looks like.
 
    Example : Your Entity
    ```bash
-    import { Entity, Column } from 'typeorm';
-    
-    @Entity({ name: 'comments' })
-    export class Notification extends BaseEntity {
+        import { Injectable } from '@nestjs/common';
+        import { CommonEntity, Page } from '@sksharma72000/nestjs-search-page';
+        import { InjectRepository } from '@nestjs/typeorm';
+        import { Repository } from "typeorm";
+        import { Comment } from './entities/comment.entity';
+        import { CommentSearchDto } from './dtos/comment.search.dto';
+        import { IPage } from '@sksharma72000/nestjs-search-page/interfaces';
 
-        @PrimaryGeneratedColumn({ type: "integer" })
-        id: number;
+        @Injectable()
+        export class CommentService extends CommonEntity<Comment> {
+            constructor(
+                @InjectRepository(Comment)
+                private readonly commentRepository: Repository<Comment>
+            ) {
+                super(commentRepository);
+            }
+            getAll(
+                pagable: IPage,
+                commentDto: CommentSearchDto
+            ): Promise<Page<Comment>> {
+                return this.findAllByPage(pagable, commentDto,[]);
+            }
+        }
+```
+\
+Following is how your CommentSearchDto looks like:
+```bash
+        import { PageSearch } from '@sksharma72000/nestjs-search-page'
+        import { Type } from 'class-transformer'
+        import { IsOptional } from 'class-validator'
+        export class CommentSearchDto {
+            @IsOptional()
+            @PageSearch({ column: "post.title" })
+            post_title: string
 
-        @Column({ type: 'text' })
-        message: string;
+            @IsOptional()
+            @Type(() => Boolean)
+            @PageSearch()
+            post: boolean
 
-        @Column()
-        user_id: number;
+            @IsOptional()
+            @Type(() => Number)
+            @PageSearch({ operation: "eq", operator: "and" })
+            post_id: number
 
-        @Column()
-        post_id: number;
+            @IsOptional()
+            @PageSearch()
+            message: string
 
-        @Column()
-        user_id: number;
+        }
+```
+\
+Following is how your PagableDto looks like:
+```bash
+        import { SortDirection } from "@sksharma72000/nestjs-search-page/constants";
+        import { IPage } from "@sksharma72000/nestjs-search-page/interfaces";
+        import { Type } from "class-transformer";
+        import { IsEnum, IsOptional } from "class-validator";
 
-        @ManyToOne(() => User, (user) => user.id)
-        @JoinColumn({ name: "user_id" })
-        user: User
+        export class PagableDto implements IPage {
 
-        @ManyToOne(() => Post, (post) => post.id)
-        @JoinColumn({ name: "post_id" })
-        post: Post
+            @IsOptional()
+            @Type(() => Number)
+            public _start: number;
 
-    }
+            @IsOptional()
+            @Type(() => Number)
+            public _end: number;
 
-    import { Entity, Column, BeforeInsert, JoinColumn, ManyToOne } from 'typeorm';
-    import { User } from "./users.entity";
-    import { Post } from "./posts.entity";
+            @IsOptional()
+            public _sort: string;
 
-    @Entity({ name: 'comments' })
-    export class Notification extends BaseEntity {
+            @IsOptional()
+            @IsEnum(SortDirection)
+            public _order: SortDirection;
+        }
 
-        @PrimaryGeneratedColumn({ type: "integer" })
-        id: number;
+```
+\
+Following is how your CommentController looks like:
 
-        @Column({ type: 'text' })
-        message: string;
+```bash
+        import {
+            Query,
+            UsePipes,
+            ValidationPipe,
+            Controller,
+            Get
+        } from '@nestjs/common';
+        import { CommentService } from './comment.service';
+        import { PagableDto } from './dtos/pagable.dto';
+        import { CommentSearchDto } from './dtos/comment.search.dto';
 
-        @Column()
-        user_id: number;
+        @Controller("comments")
+        export class AppController {
+            constructor(private readonly commentService: CommentService) { }
 
-        @Column()
-        post_id: number;
+            @Get("/")
+            @UsePipes(new ValidationPipe({
+                whitelist: true,
+                transform: true
+            }))
+            getComments(
+                @Query() commentSearchDto: CommentSearchDto,
+                @Query() pagableDto: PagableDto,
+            ) {
+                return this.commentService.getAll(pagableDto, commentSearchDto);
+            }
+        }
 
-        @Column()
-        user_id: number;
+```
 
-        @ManyToOne(() => User, (user) => user.id)
-        @JoinColumn({ name: "user_id" })
-        user: User
+Now you can make search url query for searching your comment
 
-        @ManyToOne(() => Post, (post) => post.id)
-        @JoinColumn({ name: "post_id" })
-        post: Post
+```
+http://localhost:5000/comments?post=true&post_id=1&message=Hello&_start=10&_end=50
 
-    }
+```
+
+Github:
+
+Want to explor the code for free.
+
+We appreciate your star and fork on github : https://github.com/shreekrishnaacharya/nestjs-search-page
+
+Contributing:
+
+We welcome contributions! Please see Contribution Guidelines: https://github.com/shreekrishnaacharya/nestjs-search-page/CONTRIBUTING.md
+
+License:
+
+Open-source licensed under the MIT license: https://opensource.org/licenses/MIT
+
+Credits:
+
+Developed by Shree Krishna Acharya: https://www.linkedin.com/in/shree-krishna-acharya/ Built on top of the amazing Laravel framework
 
