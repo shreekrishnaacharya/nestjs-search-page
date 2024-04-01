@@ -119,18 +119,17 @@ This is how your CommentService looks like.
         import { IPage } from '@sksharma72000/nestjs-search-page/interfaces';
 
         @Injectable()
-        export class CommentService extends CommonEntity<Comment> {
+        export class CommentService {
             constructor(
                 @InjectRepository(Comment)
                 private readonly commentRepository: Repository<Comment>
             ) {
-                super(commentRepository);
             }
             getAll(
                 pagable: IPage,
                 commentDto: CommentSearchDto
             ): Promise<Page<Comment>> {
-                return this.findAllByPage(pagable, commentDto,[]);
+                return findAllByPage(pagable, commentDto,[]);
             }
         }
 ```
