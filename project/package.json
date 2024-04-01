@@ -12,7 +12,7 @@
     "author": "Shree Krishna Acharya",
     "license": "MIT",
     "dependencies": {
-        "@nestjs/typeorm": "^10.0.1",
+        "@nestjs/typeorm": "^10.0.2",
         "mysql2": "^2.3.3",
         "@nestjs/class-validator": "^0.13.4",
         "class-validator": "^0.14.0",

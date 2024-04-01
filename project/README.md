@@ -111,7 +111,7 @@ This is how your CommentService looks like.
    Example : Your Entity
    ```bash
         import { Injectable } from '@nestjs/common';
-        import { CommonEntity, Page } from '@sksharma72000/nestjs-search-page';
+        import { findAllByPage, Page } from '@sksharma72000/nestjs-search-page';
         import { InjectRepository } from '@nestjs/typeorm';
         import { Repository } from "typeorm";
         import { Comment } from './entities/comment.entity';
@@ -129,7 +129,7 @@ This is how your CommentService looks like.
                 pagable: IPage,
                 commentDto: CommentSearchDto
             ): Promise<Page<Comment>> {
-                return findAllByPage(pagable, commentDto,[]);
+                return findAllByPage<Comment>(this.commentRepository, pagable, commentDto,[]);
             }
         }
 ```
