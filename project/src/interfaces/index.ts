@@ -32,6 +32,7 @@ export interface IFindAllByPage {
 }
 
 export interface IFindOne {
+  id: string | number
   repo: Repository<any>,
   queryDto?: Object,
   customQuery?: IPageSearch[]

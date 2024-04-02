@@ -47,12 +47,15 @@ export async function findAllByPage<T>({
 }
 
 export async function findOne<T>({
+  id,
   repo,
   queryDto,
   customQuery
 }: IFindOne): Promise<T> {
   let whereCondition = { and: [], or: [] } as TWhere;
-  const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto)
+  const cQ = customQuery ?? [];
+  cQ.push({ column: "id", value: id, operation: "eq", operator: "and" })
+  const { where: whereRaw, relations } = _getMetaQuery(whereCondition, cQ, queryDto)
   const options: FindManyOptions<T> = {
     where: whereRaw as unknown as FindOptionsWhere<T>,
     relations: relations,
