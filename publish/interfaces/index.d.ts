@@ -1,4 +1,5 @@
 import { Operation, Operator, SortDirection } from "../constants";
+import { Repository } from "typeorm";
 export interface IPageSearch {
     is_relational?: boolean | null;
     column?: string;
@@ -17,6 +18,17 @@ export interface ISortable {
     asKeyValue(): {
         [key: string]: string;
     };
+}
+export interface IFindAllByPage {
+    repo: Repository<any>;
+    page: IPage;
+    queryDto?: Object;
+    customQuery?: IPageSearch[];
+}
+export interface IFindOne {
+    repo: Repository<any>;
+    queryDto?: Object;
+    customQuery?: IPageSearch[];
 }
 export interface IPageable {
     getSkip(): number;
