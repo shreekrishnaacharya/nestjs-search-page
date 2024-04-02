@@ -31,6 +31,12 @@ export interface IFindAllByPage {
   customQuery?: IPageSearch[]
 }
 
+export interface IFindOne {
+  repo: Repository<any>,
+  queryDto?: Object,
+  customQuery?: IPageSearch[]
+}
+
 export interface IPageable {
   getSkip(): number;
   getTake(): number;

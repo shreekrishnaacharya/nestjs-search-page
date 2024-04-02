@@ -13,7 +13,7 @@ import {
 
 import { Page } from "../models/page.model";
 import { Operation, PAGE_SEARCH } from "../constants";
-import { IFindAllByPage, IPageSearch, IPageable } from "../interfaces";
+import { IFindAllByPage, IFindOne, IPageSearch, IPageable } from "../interfaces";
 import { PageRequest } from "./page-request.model";
 
 type TWhere = { [key: string]: Array<any> }
@@ -44,6 +44,20 @@ export async function findAllByPage<T>({
   const elements: T[] = result[0];
   const totalElements: number = result[1];
   return _generatePageResult<T>(elements, totalElements, pageable);
+}
+
+export async function findOne<T>({
+  repo,
+  queryDto,
+  customQuery
+}: IFindOne): Promise<T> {
+  let whereCondition = { and: [], or: [] } as TWhere;
+  const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto)
+  const options: FindManyOptions<T> = {
+    where: whereRaw as unknown as FindOptionsWhere<T>,
+    relations: relations,
+  };
+  return await repo.findOne(options);
 }
 
 async function _generatePageResult<T>(
