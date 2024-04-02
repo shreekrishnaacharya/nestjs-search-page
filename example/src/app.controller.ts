@@ -3,7 +3,8 @@ import {
   UsePipes,
   ValidationPipe,
   Controller,
-  Get
+  Get,
+  Param
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { PagableDto } from './dtos/pagable.dto';
@@ -23,5 +24,13 @@ export class AppController {
     @Query() pagableDto: PagableDto,
   ) {
     return this.commentService.getAll(pagableDto, commentSearchDto);
+  }
+
+  @Get("/:id")
+  getOne(
+    @Param("id") id: number,
+    @Query() commentSearchDto: CommentSearchDto,
+  ) {
+    return this.commentService.getOne(id, commentSearchDto);
   }
 }

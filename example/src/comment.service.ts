@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { findAllByPage, findOne, Page } from '@sksharma72000/nestjs-search-page';
+import { findAllByPage, findOne, Page, IPage } from '@sksharma72000/nestjs-search-page';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm";
 import { Comment } from './entities/comment.entity';
 import { CommentSearchDto } from './dtos/comment.search.dto';
-import { IPage } from '@sksharma72000/nestjs-search-page/interfaces';
 
 @Injectable()
 export class CommentService {
