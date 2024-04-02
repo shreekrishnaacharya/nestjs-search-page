@@ -31,9 +31,9 @@
         value?: string | number | boolean | null;
     }
     ```
-    *is_relational*: Indicate if the attribute is relational. If attribute value type is boolen, \
-                    then also the current attribute is taken relational unless is_relational is set to false.\
-                    ie this will extract the relational table of current table and add to your response. Default value is null.\
+    *is_relational*: Indicate if the attribute is relational. By Default, if attribute value type is boolen, \
+                    then attribute is considered as relational unless it is set to false.\
+                    ie this will extract the relational table of current table with name of attribute and add to your response. Default value is null.\
 \
     *column*: Name of table's column where your want to query. Default value is the name of the attribute.\
 \
@@ -54,7 +54,7 @@
     *value*: Value of query attribute. It can be one of type: string | number | boolean | null. Default is null.\
 
 2. IPage\
-    IPage defines the attribute that customise your pagination.
+    IPage defines the attribute that customize your pagination.
     Your dto should implements IPage or has all attribute of IPage defined. IPage consist of following attributes :
     ```
     interface IPage {
@@ -79,58 +79,50 @@
     *_order*: Define the order of column you want the list to be sorted by.
         By default, the list will be sorted buy in DESC order of id column.
 
-3. CommonEntity\
-    You must extends your service with CommonEntity class inorder to enable pagination in your service. CommonEntity also takes the entity type, which is the entity that you have created the services for. also you need to call super class and pass your serviceRepository as paremeter. \
+3. findAllByPage\
+    It is the function that is responsible for quering into table with to enable pagination in your service. It takes IFindAllByPage interface as parameter. IFindAllByPage consist of repo, page, queryDto, customQuery where repo is your repositiry to perform query, page is IPage, queryDto is your dto and customQuery is where you can add custom where condition. It taked the Model class as its type. \
     Example :
     ```
-    @Injectable()
-    export class CommentService extends CommonEntity<Comment> {
-        constructor(
-            @InjectRepository(Comment)
-            private readonly commentRepository: Repository<Comment>
-        ) {
-            super(commentRepository);
-        }
-        //... rest of your code
-    }
-    ```
-4. findAllByPage\
-    Once you have extends CommonEntity in your service. You can call findAllByPage method as `this.findAllByPage`. findAllByPage takes three arguments ie first IPage, second your dto with @PageSearch decorated attribute, and custom IPageSearch List. Here 1st and 2nd argument are required and 3rd is optional. You can pass your IPage dto as 1st argument, your custom dto with @PageSearch decorated attribute as second argument and you can add additional query condition of type IPageSearch to your pagination with the third argument. This method returns Promise of type `Page`.
-    Example of Page
-    ```
-        export declare interface Page<T> {
-            elements: T[];
-            totalElements: number;
-            pagable: IPageable;
-        }
+    findAllByPage<Comment>({ repo: this.commentRepository, page: pagable, queryDto: commentDto });
     ```
 
+4. findOne\
+    This findOne perform query by id into your repository and gets you one model result or null. It takes IFindOne interface as parameter. IFindOne consist of id, repo, queryDto, customQuery where id is id of model, repo is your repositiry to perform query, queryDto is your dto and customQuery is where you can add custom where condition. It taked the Model class as its type. \
+    Example :
+    ```
+    findOne<Comment>({id:1, repo: this.commentRepository, queryDto: commentDto });
+    ```
 \
 This is how your CommentService looks like.
 
    Example : Your Entity
    ```bash
         import { Injectable } from '@nestjs/common';
-        import { CommonEntity, Page } from '@sksharma72000/nestjs-search-page';
+        import { findAllByPage, findOne, Page, IPage } from '@sksharma72000/nestjs-search-page';
         import { InjectRepository } from '@nestjs/typeorm';
         import { Repository } from "typeorm";
         import { Comment } from './entities/comment.entity';
         import { CommentSearchDto } from './dtos/comment.search.dto';
-        import { IPage } from '@sksharma72000/nestjs-search-page/interfaces';
 
         @Injectable()
-        export class CommentService extends CommonEntity<Comment> {
+        export class CommentService {
             constructor(
                 @InjectRepository(Comment)
                 private readonly commentRepository: Repository<Comment>
             ) {
-                super(commentRepository);
             }
             getAll(
                 pagable: IPage,
                 commentDto: CommentSearchDto
             ): Promise<Page<Comment>> {
-                return this.findAllByPage(pagable, commentDto,[]);
+                return findAllByPage<Comment>({repo:this.commentRepository, page:pagable, queryDto:commentDto, customQuery:[{column: 'status',value:'active', operation: "eq", operator: "and" }]});
+            }
+
+            getOne(
+                id: number,
+                commentDto: CommentSearchDto
+            ): Promise<Page<Comment>> {
+                return findOne<Comment>({id,repo:this.commentRepository,queryDto:commentDto,customQuery:[{column:'status',value:'active', operation: "eq", operator: "and" }]});
             }
         }
 ```
@@ -162,37 +154,12 @@ Following is how your CommentSearchDto looks like:
         }
 ```
 \
-Following is how your PagableDto looks like:
-```bash
-        import { SortDirection } from "@sksharma72000/nestjs-search-page/constants";
-        import { IPage } from "@sksharma72000/nestjs-search-page/interfaces";
-        import { Type } from "class-transformer";
-        import { IsEnum, IsOptional } from "class-validator";
 
-        export class PagableDto implements IPage {
-
-            @IsOptional()
-            @Type(() => Number)
-            public _start: number;
-
-            @IsOptional()
-            @Type(() => Number)
-            public _end: number;
-
-            @IsOptional()
-            public _sort: string;
-
-            @IsOptional()
-            @IsEnum(SortDirection)
-            public _order: SortDirection;
-        }
-
-```
-\
 Following is how your CommentController looks like:
 
 ```bash
         import {
+            Param,
             Query,
             UsePipes,
             ValidationPipe,
@@ -218,6 +185,15 @@ Following is how your CommentController looks like:
             ) {
                 return this.commentService.getAll(pagableDto, commentSearchDto);
             }
+
+            @Get("/:id")
+            getOne(
+                @Param("id") id: number,
+                @Query() commentSearchDto: CommentSearchDto,
+            ) {
+                return this.commentService.getOne(id, commentSearchDto);
+            }
+            
         }
 
 ```
@@ -226,6 +202,7 @@ Now you can make search url query for searching your comment
 
 ```
 http://localhost:5000/comments?post=true&post_id=1&message=Hello&_start=10&_end=50
+http://localhost:5000/comments/5?post=true
 
 ```
 
