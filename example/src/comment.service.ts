@@ -22,7 +22,7 @@ export class CommentService {
   getOne(
     id: number,
     commentDto: CommentSearchDto
-  ): Promise<Page<Comment>> {
+  ): Promise<Comment> {
     return findOne<Comment>({ id, repo: this.commentRepository, queryDto: commentDto, customQuery: [{ column: 'status', value: 'active', operation: "eq", operator: "and" }] });
   }
 }
