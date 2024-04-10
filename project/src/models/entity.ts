@@ -54,7 +54,9 @@ export async function findOne<T>({
 }: IFindOne): Promise<T> {
   let whereCondition = { and: [], or: [] } as TWhere;
   const cQ = customQuery ?? [];
-  cQ.push({ column: "id", value: id, operation: "eq", operator: "and" })
+  if (id) {
+    cQ.push({ column: "id", value: id, operation: "eq", operator: "and" })
+  }
   const { where: whereRaw, relations } = _getMetaQuery(whereCondition, cQ, queryDto)
   const options: FindManyOptions<T> = {
     where: whereRaw as unknown as FindOptionsWhere<T>,
