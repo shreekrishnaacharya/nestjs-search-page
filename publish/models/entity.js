@@ -38,7 +38,9 @@ function findOne({ id, repo, queryDto, customQuery }) {
     return __awaiter(this, void 0, void 0, function* () {
         let whereCondition = { and: [], or: [] };
         const cQ = customQuery !== null && customQuery !== void 0 ? customQuery : [];
-        cQ.push({ column: "id", value: id, operation: "eq", operator: "and" });
+        if (id) {
+            cQ.push({ column: "id", value: id, operation: "eq", operator: "and" });
+        }
         const { where: whereRaw, relations } = _getMetaQuery(whereCondition, cQ, queryDto);
         const options = {
             where: whereRaw,

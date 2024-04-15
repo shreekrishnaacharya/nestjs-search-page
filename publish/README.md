@@ -139,7 +139,7 @@ Following is how your CommentSearchDto looks like:
 
             @IsOptional()
             @Type(() => Boolean)
-            @PageSearch()
+            @PageSearch({column:"post.author"})//here indication column name as 'post.author' for relation will return post with its relational column author
             post: boolean
 
             @IsOptional()
