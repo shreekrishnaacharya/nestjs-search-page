@@ -13,7 +13,7 @@ import {
 
 import { Page } from "../models/page.model";
 import { Operation, PAGE_SEARCH } from "../constants";
-import { IFindAllByPage, IFindOne, IPage, IPageSearch, IPageable } from "../interfaces";
+import { IFindAllByPage, IFindOne, IFindOptionByPage, IPage, IPageSearch, IPageable } from "../interfaces";
 import { PageRequest } from "./page-request.model";
 
 type TWhere = { [key: string]: Array<any> }
@@ -50,7 +50,7 @@ export async function findOptions<T>({
   page,
   queryDto,
   customQuery
-}: IFindAllByPage): Promise<FindManyOptions> {
+}: IFindOptionByPage): Promise<FindManyOptions> {
   const pageable: IPageable = PageRequest.from(page);
   let whereCondition = { and: [], or: [] } as TWhere;
   const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();

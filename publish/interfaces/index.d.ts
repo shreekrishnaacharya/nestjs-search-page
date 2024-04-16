@@ -25,6 +25,11 @@ export interface IFindAllByPage {
     queryDto?: Object;
     customQuery?: IPageSearch[];
 }
+export interface IFindOptionByPage {
+    page: IPage;
+    queryDto?: Object;
+    customQuery?: IPageSearch[];
+}
 export interface IFindOne {
     id?: string | number;
     repo: Repository<any>;

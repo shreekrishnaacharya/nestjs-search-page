@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findOne = exports.findAllByPage = void 0;
+exports.findOne = exports.findOptions = exports.findAllByPage = void 0;
 const typeorm_1 = require("typeorm");
 const constants_1 = require("../constants");
 const page_request_model_1 = require("./page-request.model");
@@ -30,10 +30,27 @@ function findAllByPage({ repo, page, queryDto, customQuery }) {
         const result = yield repo.findAndCount(options);
         const elements = result[0];
         const totalElements = result[1];
-        return _generatePageResult(elements, totalElements, pageable);
+        return _generatePageResult(elements, totalElements, page);
     });
 }
 exports.findAllByPage = findAllByPage;
+function findOptions({ page, queryDto, customQuery }) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const pageable = page_request_model_1.PageRequest.from(page);
+        let whereCondition = { and: [], or: [] };
+        const sort = (_a = pageable.getSort()) === null || _a === void 0 ? void 0 : _a.asKeyValue();
+        const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto);
+        return {
+            where: whereRaw,
+            order: sort,
+            relations: relations,
+            skip: pageable.getSkip(),
+            take: pageable.getTake(),
+        };
+    });
+}
+exports.findOptions = findOptions;
 function findOne({ id, repo, queryDto, customQuery }) {
     return __awaiter(this, void 0, void 0, function* () {
         let whereCondition = { and: [], or: [] };
