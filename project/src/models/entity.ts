@@ -46,6 +46,25 @@ export async function findAllByPage<T>({
   return _generatePageResult<T>(elements, totalElements, page);
 }
 
+export async function findOptions<T>({
+  page,
+  queryDto,
+  customQuery
+}: IFindAllByPage): Promise<FindManyOptions> {
+  const pageable: IPageable = PageRequest.from(page);
+  let whereCondition = { and: [], or: [] } as TWhere;
+  const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
+  const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto)
+  return {
+    where: whereRaw as unknown as FindOptionsWhere<T>,
+    order: sort as unknown as FindOptionsOrder<T>,
+    relations: relations,
+    skip: pageable.getSkip(),
+    take: pageable.getTake(),
+  };
+}
+
+
 export async function findOne<T>({
   id,
   repo,
