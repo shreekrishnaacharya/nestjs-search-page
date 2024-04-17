@@ -46,11 +46,11 @@ export async function findAllByPage<T>({
   return _generatePageResult<T>(elements, totalElements, page);
 }
 
-export async function findOptions<T>({
+export function findOptions<T>({
   page,
   queryDto,
   customQuery
-}: IFindOptionByPage): Promise<FindManyOptions> {
+}: IFindOptionByPage): FindManyOptions {
   const pageable: IPageable = PageRequest.from(page);
   let whereCondition = { and: [], or: [] } as TWhere;
   const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
