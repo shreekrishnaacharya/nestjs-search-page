@@ -36,19 +36,17 @@ function findAllByPage({ repo, page, queryDto, customQuery }) {
 exports.findAllByPage = findAllByPage;
 function findOptions({ page, queryDto, customQuery }) {
     var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const pageable = page_request_model_1.PageRequest.from(page);
-        let whereCondition = { and: [], or: [] };
-        const sort = (_a = pageable.getSort()) === null || _a === void 0 ? void 0 : _a.asKeyValue();
-        const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto);
-        return {
-            where: whereRaw,
-            order: sort,
-            relations: relations,
-            skip: pageable.getSkip(),
-            take: pageable.getTake(),
-        };
-    });
+    const pageable = page_request_model_1.PageRequest.from(page);
+    let whereCondition = { and: [], or: [] };
+    const sort = (_a = pageable.getSort()) === null || _a === void 0 ? void 0 : _a.asKeyValue();
+    const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto);
+    return {
+        where: whereRaw,
+        order: sort,
+        relations: relations,
+        skip: pageable.getSkip(),
+        take: pageable.getTake(),
+    };
 }
 exports.findOptions = findOptions;
 function findOne({ id, repo, queryDto, customQuery }) {

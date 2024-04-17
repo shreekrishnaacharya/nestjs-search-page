@@ -37,8 +37,8 @@ export async function findAllByPage<T>({
     where: whereRaw as unknown as FindOptionsWhere<T>,
     order: sort as unknown as FindOptionsOrder<T>,
     relations: relations,
-    skip: pageable.getSkip(),
-    take: pageable.getTake(),
+    skip: page._start,
+    take: (page._end-page._start),
   };
   const result = await repo.findAndCount(options);
   const elements: T[] = result[0];
@@ -59,8 +59,8 @@ export function findOptions<T>({
     where: whereRaw as unknown as FindOptionsWhere<T>,
     order: sort as unknown as FindOptionsOrder<T>,
     relations: relations,
-    skip: pageable.getSkip(),
-    take: pageable.getTake(),
+    skip: page._start,
+    take: (page._end-page._start),
   };
 }
 
@@ -109,7 +109,7 @@ function _getMetaQuery(whereConditions: TWhere, conditions?: IPageSearch[], meta
         relational = _buildRelation(relational, pageSearch);
         continue;
       }
-      if (typeof pageSearch.value === "string" && pageSearch.value.toString() === "") {
+      if (pageSearch.value.toString() == "") {
         continue;
       }
       _buildWhere(pageSearch, whereConditions)
