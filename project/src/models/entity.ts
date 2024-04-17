@@ -37,8 +37,8 @@ export async function findAllByPage<T>({
     where: whereRaw as unknown as FindOptionsWhere<T>,
     order: sort as unknown as FindOptionsOrder<T>,
     relations: relations,
-    skip: page._start,
-    take: (page._end-page._start),
+    skip: pageable.getSkip(),
+    take: pageable.getTake(),
   };
   const result = await repo.findAndCount(options);
   const elements: T[] = result[0];
@@ -59,8 +59,8 @@ export function findOptions<T>({
     where: whereRaw as unknown as FindOptionsWhere<T>,
     order: sort as unknown as FindOptionsOrder<T>,
     relations: relations,
-    skip: page._start,
-    take: (page._end-page._start),
+    skip: pageable.getSkip(),
+    take: pageable.getTake(),
   };
 }
 
@@ -132,7 +132,7 @@ function _getMetaQuery(whereConditions: TWhere, conditions?: IPageSearch[], meta
   if (whereArray.length == 0) {
     whereConditions.and.forEach((ele, i) => {
       whereArray[0] = {
-        ...whereArray,
+        ...whereArray[0],
         ...ele
       }
     });
