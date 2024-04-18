@@ -8,7 +8,8 @@ import {
   MoreThanOrEqual,
   LessThan,
   LessThanOrEqual,
-  Not
+  Not,
+  In
 } from "typeorm";
 
 import { Page } from "../models/page.model";
@@ -179,11 +180,13 @@ function _buildRelation(relational: object, pageSearch: IPageSearch) {
   return relational;
 }
 function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
-  let i = 0;
   let cond = {};
-  const { column, is_nested, operation, operator, value } = pageSearch
+  let { column, is_nested, operation, operator, value } = pageSearch
   if (!column) {
     return whereConditions;
+  }
+  if(!operation && Array.isArray(value)){
+    operation="in"
   }
   if (is_nested) {
     const nested = column.split('.');
@@ -201,8 +204,8 @@ function _switchContition(operation: Operation, value: any) {
       return MoreThan(value)
     case "gteq":
       return MoreThanOrEqual(value)
-    // case "in":
-    //   return In(value)
+    case "in":
+      return In(value)
     case "like":
       return Like(`%${value}%`)
     case "lt":

@@ -88,7 +88,7 @@ function _getMetaQuery(whereConditions, conditions, metaQuery) {
                 relational = _buildRelation(relational, pageSearch);
                 continue;
             }
-            if (typeof pageSearch.value === "string" && pageSearch.value.toString() === "") {
+            if (pageSearch.value.toString() == "") {
                 continue;
             }
             _buildWhere(pageSearch, whereConditions);
@@ -112,7 +112,7 @@ function _getMetaQuery(whereConditions, conditions, metaQuery) {
     });
     if (whereArray.length == 0) {
         whereConditions.and.forEach((ele, i) => {
-            whereArray[0] = Object.assign(Object.assign({}, whereArray), ele);
+            whereArray[0] = Object.assign(Object.assign({}, whereArray[0]), ele);
         });
     }
     else if (whereConditions.and.length > 0) {
