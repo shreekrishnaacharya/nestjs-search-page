@@ -55,7 +55,7 @@ export function findOptions<T>({
   if(page==undefined&&queryDto==undefined&&customQuery==undefined){
       throw new Error("One of page, or queryDto, or customQuery must be defined")
   }
-  const pageable: IPageable = PageRequest.from(page);
+  const pageable: IPageable = page? PageRequest.from(page):undefined;
   let whereCondition = { and: [], or: [] } as TWhere;
   const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
   const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto)
@@ -63,8 +63,8 @@ export function findOptions<T>({
     where: whereRaw as unknown as FindOptionsWhere<T>,
     order: sort as unknown as FindOptionsOrder<T>,
     relations: relations,
-    skip: pageable.getSkip(),
-    take: pageable.getTake(),
+    skip: pageable?.getSkip(),
+    take: pageable?.getTake(),
   };
 }
 
