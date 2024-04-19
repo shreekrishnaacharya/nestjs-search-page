@@ -149,11 +149,16 @@ function _buildRelation(relational, pageSearch) {
     return relational;
 }
 function _buildWhere(pageSearch, whereConditions) {
-    let i = 0;
     let cond = {};
-    const { column, is_nested, operation, operator, value } = pageSearch;
+    let { column, is_nested, operation, operator, value } = pageSearch;
     if (!column) {
         return whereConditions;
+    }
+    if (!operation && Array.isArray(value)) {
+        operation = "in";
+    }
+    if (operation == "in" && !Array.isArray(value)) {
+        value = [value];
     }
     if (is_nested) {
         const nested = column.split('.');
@@ -171,8 +176,8 @@ function _switchContition(operation, value) {
             return (0, typeorm_1.MoreThan)(value);
         case "gteq":
             return (0, typeorm_1.MoreThanOrEqual)(value);
-        // case "in":
-        //   return In(value)
+        case "in":
+            return (0, typeorm_1.In)(value);
         case "like":
             return (0, typeorm_1.Like)(`%${value}%`);
         case "lt":

@@ -9,7 +9,7 @@ export interface IPageSearch {
   is_nested?: boolean
   operation?: Operation
   operator?: Operator,
-  value?: string | number | boolean | null
+  value?: string | number | boolean | null | Array<string|number|boolean>
 }
 
 export interface IPage {
@@ -32,7 +32,7 @@ export interface IFindAllByPage {
 }
 
 export interface IFindOptionByPage {
-  page: IPage,
+  page?: IPage,
   queryDto?: Object,
   customQuery?: IPageSearch[]
 }

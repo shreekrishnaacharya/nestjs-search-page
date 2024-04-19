@@ -52,6 +52,9 @@ export function findOptions<T>({
   queryDto,
   customQuery
 }: IFindOptionByPage): FindManyOptions {
+  if(page==undefined&&queryDto==undefined&&customQuery==undefined){
+      throw new Error("One of page, or queryDto, or customQuery must be defined")
+  }
   const pageable: IPageable = PageRequest.from(page);
   let whereCondition = { and: [], or: [] } as TWhere;
   const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
@@ -187,6 +190,9 @@ function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
   }
   if(!operation && Array.isArray(value)){
     operation="in"
+  }
+  if(operation=="in" && !Array.isArray(value)){
+    value=[value]
   }
   if (is_nested) {
     const nested = column.split('.');
