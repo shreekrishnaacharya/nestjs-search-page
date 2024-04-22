@@ -94,10 +94,11 @@
     ```
 \
 5. findOptions\
-    It is the function that is responsible for building typeorm FindManyOptions and return the options. It is similar to findAllByPage, except it does not takes repo and does not actually perform  query, rather returns the FindManyOptions so you can futher customize the where option and run your query. It takes IFindOptionByPage interface as parameter. IFindOptionByPage consist of page, queryDto, customQuery where repo is your repositiry to perform query, page is IPage, queryDto is your dto and customQuery is where you can add custom where condition. It taked the Model class as its type. \
+    It is the function that is responsible for building typeorm FindManyOptions and return the options. It is similar to findAllByPage, except it does not takes repo and does not actually perform  query, rather returns the FindManyOptions so you can futher customize the where option and run your query. It takes IFindOptionByPage interface as parameter. IFindOptionByPage consist of page, queryDto, customQuery where page is IPage, queryDto is your dto and customQuery is where you can add custom where condition. It taked the Model class as its type. \
     Example :
+
     ```
-    findOptions<Comment>({ repo: this.commentRepository, page: pagable, queryDto: commentDto });
+    findOptions<Comment>({ page: pagable, queryDto: commentDto });
     /*
     {
         where, #your where condition from dto
@@ -107,6 +108,7 @@
         take, #your take from from IPage end
     }
     */
+
     ```
 \
 This is how your CommentService looks like.
