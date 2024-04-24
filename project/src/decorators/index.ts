@@ -4,7 +4,6 @@ import { IPageSearch } from "../interfaces";
 
 export function PageSearch(options?: IPageSearch) {
     return (target: any, propertyKey: string) => {
-
         const optionsList: IPageSearch = {
             is_relational: null,
             column: propertyKey,
