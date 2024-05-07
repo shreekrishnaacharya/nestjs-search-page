@@ -2,7 +2,7 @@
 
 **Installation:**
 
-1. Install via Composer:
+1. Install via NPM:
 
     ```bash
    npm install @sksharma72000/nestjs-search-page
