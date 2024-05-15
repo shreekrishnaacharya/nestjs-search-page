@@ -6,6 +6,7 @@ export function PageSearch(options?: IPageSearch) {
     return (target: any, propertyKey: string) => {
         const optionsList: IPageSearch = {
             column: propertyKey,
+            is_relational: null,
             is_nested: false,
             operation: "like",
             operator: "or",
