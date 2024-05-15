@@ -2,7 +2,7 @@
 
 **Installation:**
 
-1. Install via Composer:
+1. Install via NPM:
 
     ```bash
    npm install @sksharma72000/nestjs-search-page
@@ -239,5 +239,5 @@ Open-source licensed under the MIT license: https://opensource.org/licenses/MIT
 
 Credits:
 
-Developed by Shree Krishna Acharya: https://www.linkedin.com/in/shree-krishna-acharya/ Built on top of the amazing Laravel framework
+Developed by Shree Krishna Acharya: https://www.linkedin.com/in/shree-krishna-acharya/ Built on top of the amazing Nestjs framework
 
