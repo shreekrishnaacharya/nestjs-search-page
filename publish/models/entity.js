@@ -36,7 +36,10 @@ function findAllByPage({ repo, page, queryDto, customQuery }) {
 exports.findAllByPage = findAllByPage;
 function findOptions({ page, queryDto, customQuery }) {
     var _a;
-    const pageable = page_request_model_1.PageRequest.from(page);
+    if (page == undefined && queryDto == undefined && customQuery == undefined) {
+        throw new Error("One of page, or queryDto, or customQuery must be defined");
+    }
+    const pageable = page ? page_request_model_1.PageRequest.from(page) : undefined;
     let whereCondition = { and: [], or: [] };
     const sort = (_a = pageable.getSort()) === null || _a === void 0 ? void 0 : _a.asKeyValue();
     const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto);
@@ -44,8 +47,8 @@ function findOptions({ page, queryDto, customQuery }) {
         where: whereRaw,
         order: sort,
         relations: relations,
-        skip: pageable.getSkip(),
-        take: pageable.getTake(),
+        skip: pageable === null || pageable === void 0 ? void 0 : pageable.getSkip(),
+        take: pageable === null || pageable === void 0 ? void 0 : pageable.getTake(),
     };
 }
 exports.findOptions = findOptions;
@@ -126,6 +129,8 @@ function _getMetaQuery(whereConditions, conditions, metaQuery) {
     }
     return { where: [...whereArray], relations: Object.assign({}, relational) };
 }
+function _getWhereQuery() {
+}
 function _recursiveNestedObject(column, value) {
     if (column.length == 1) {
         const [key] = column;
@@ -135,6 +140,20 @@ function _recursiveNestedObject(column, value) {
     return { [key]: _recursiveNestedObject(rest, value) };
 }
 function _buildRelation(relational, pageSearch) {
+    const { column, is_nested } = pageSearch;
+    if (!column) {
+        return relational;
+    }
+    if (is_nested) {
+        const nested = _recursiveNestedObject(column.split("."), true);
+        relational = Object.assign(Object.assign({}, relational), nested);
+    }
+    else {
+        relational[column] = true;
+    }
+    return relational;
+}
+function _buildSelect(relational, pageSearch) {
     const { column, is_nested } = pageSearch;
     if (!column) {
         return relational;
@@ -159,6 +178,12 @@ function _buildWhere(pageSearch, whereConditions) {
     }
     if (operation == "in" && !Array.isArray(value)) {
         value = [value];
+    }
+    if (operation == "between" && !Array.isArray(value)) {
+        return;
+    }
+    if (operation == "between" && Array.isArray(value) && value.length < 2) {
+        return;
     }
     if (is_nested) {
         const nested = column.split('.');
@@ -186,6 +211,8 @@ function _switchContition(operation, value) {
             return (0, typeorm_1.LessThanOrEqual)(value);
         case "neq":
             return (0, typeorm_1.Not)((0, typeorm_1.Equal)(value));
+        case "between":
+            return (0, typeorm_1.Between)(value[0], value[1]);
         default:
             return value;
     }
