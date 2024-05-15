@@ -47,7 +47,7 @@
                     ```
 \
 \
-    *operation*: Operation are one of "eq" | "neq" | "in" | "gt" | "gteq" | "lt" | "lteq" | "like". Default is "like".\
+    *operation*: Operation are one of "eq" | "neq" | "in" | "gt" | "gteq" | "lt" | "lteq" | "like" | "between". Default is "like".\
 \
     *operator*: Operator are one of "and" | "or". Default is "and".\
 \

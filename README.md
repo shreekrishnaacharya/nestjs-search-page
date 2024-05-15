@@ -2,7 +2,7 @@
 
 **Installation:**
 
-1. Install via NPM:
+1. Install via Composer:
 
     ```bash
    npm install @sksharma72000/nestjs-search-page
@@ -47,7 +47,7 @@
                     ```
 \
 \
-    *operation*: Operation are one of "eq" | "neq" | "in" | "gt" | "gteq" | "lt" | "lteq" | "like". Default is "like".\
+    *operation*: Operation are one of "eq" | "neq" | "in" | "gt" | "gteq" | "lt" | "lteq" | "like" | "between". Default is "like".\
 \
     *operator*: Operator are one of "and" | "or". Default is "and".\
 \
@@ -92,10 +92,11 @@
     ```
     findOne<Comment>({id:1, repo: this.commentRepository, queryDto: commentDto });
     ```
-
+\
 5. findOptions\
     It is the function that is responsible for building typeorm FindManyOptions and return the options. It is similar to findAllByPage, except it does not takes repo and does not actually perform  query, rather returns the FindManyOptions so you can futher customize the where option and run your query. It takes IFindOptionByPage interface as parameter. IFindOptionByPage consist of page, queryDto, customQuery where page is IPage, queryDto is your dto and customQuery is where you can add custom where condition. It taked the Model class as its type. \
     Example :
+
     ```
     findOptions<Comment>({ page: pagable, queryDto: commentDto });
     /*
@@ -170,7 +171,7 @@ Following is how your CommentSearchDto looks like:
 
         }
 ```
-
+\
 
 Following is how your CommentController looks like:
 
@@ -239,5 +240,5 @@ Open-source licensed under the MIT license: https://opensource.org/licenses/MIT
 
 Credits:
 
-Developed by Shree Krishna Acharya: https://www.linkedin.com/in/shree-krishna-acharya/ Built on top of the amazing Nestjs framework
+Developed by Shree Krishna Acharya: https://www.linkedin.com/in/shree-krishna-acharya/ Built on top of the amazing Laravel framework
 
