@@ -4,12 +4,20 @@ import {
 } from "typeorm";
 
 export interface IPageSearch {
-  is_relational?: boolean | null
   column?: string
+  is_relational?: boolean
   is_nested?: boolean
   operation?: Operation
   operator?: Operator,
-  value?: string | number | boolean | null | Array<string|number|boolean>
+  value?: string | number | boolean | null | Array<string | number | boolean>
+}
+
+export interface ISelectRelation {
+  column?: string
+}
+
+export interface ISelectColumn {
+  column?: string
 }
 
 export interface IPage {

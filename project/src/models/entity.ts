@@ -9,7 +9,8 @@ import {
   LessThan,
   LessThanOrEqual,
   Not,
-  In
+  In,
+  Between
 } from "typeorm";
 
 import { Page } from "../models/page.model";
@@ -21,7 +22,8 @@ type TWhere = { [key: string]: Array<any> }
 
 interface IBuildReturn {
   where: Array<TWhere>
-  relations: object
+  relations: object,
+  // select: object | Array<string>
 }
 
 export async function findAllByPage<T>({
@@ -52,10 +54,10 @@ export function findOptions<T>({
   queryDto,
   customQuery
 }: IFindOptionByPage): FindManyOptions {
-  if(page==undefined&&queryDto==undefined&&customQuery==undefined){
-      throw new Error("One of page, or queryDto, or customQuery must be defined")
+  if (page == undefined && queryDto == undefined && customQuery == undefined) {
+    throw new Error("One of page, or queryDto, or customQuery must be defined")
   }
-  const pageable: IPageable = page? PageRequest.from(page):undefined;
+  const pageable: IPageable = page ? PageRequest.from(page) : undefined;
   let whereCondition = { and: [], or: [] } as TWhere;
   const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
   const { where: whereRaw, relations } = _getMetaQuery(whereCondition, customQuery, queryDto)
@@ -156,6 +158,10 @@ function _getMetaQuery(whereConditions: TWhere, conditions?: IPageSearch[], meta
   return { where: [...whereArray], relations: { ...relational } };
 }
 
+function _getWhereQuery() {
+
+}
+
 function _recursiveNestedObject(column: Array<string>, value: any) {
   if (column.length == 1) {
     const [key] = column
@@ -182,17 +188,43 @@ function _buildRelation(relational: object, pageSearch: IPageSearch) {
 
   return relational;
 }
+
+function _buildSelect(relational: object, pageSearch: IPageSearch) {
+  const { column, is_nested } = pageSearch
+  if (!column) {
+    return relational;
+  }
+  if (is_nested) {
+    const nested = _recursiveNestedObject(column.split("."), true);
+    relational = {
+      ...relational,
+      ...nested
+    }
+  } else {
+    relational[column] = true;
+  }
+
+  return relational;
+}
+
+
 function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
   let cond = {};
   let { column, is_nested, operation, operator, value } = pageSearch
   if (!column) {
     return whereConditions;
   }
-  if(!operation && Array.isArray(value)){
-    operation="in"
+  if (!operation && Array.isArray(value)) {
+    operation = "in"
   }
-  if(operation=="in" && !Array.isArray(value)){
-    value=[value]
+  if (operation == "in" && !Array.isArray(value)) {
+    value = [value]
+  }
+  if (operation == "between" && !Array.isArray(value)) {
+    return;
+  }
+  if (operation == "between" && Array.isArray(value) && value.length < 2) {
+    return
   }
   if (is_nested) {
     const nested = column.split('.');
@@ -220,6 +252,8 @@ function _switchContition(operation: Operation, value: any) {
       return LessThanOrEqual(value)
     case "neq":
       return Not(Equal(value))
+    case "between":
+      return Between(value[0], value[1])
     default:
       return value
   }
