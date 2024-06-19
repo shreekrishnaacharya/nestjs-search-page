@@ -1,62 +1,59 @@
-import { Operation, Operator, SortDirection } from "../constants"
-import {
-  Repository
-} from "typeorm";
+import { Operation, Operator, SortDirection } from "../constants";
+import { Repository } from "typeorm";
 
 export interface IPageSearch {
-  column?: string
-  is_relational?: boolean
-  is_nested?: boolean
-  operation?: Operation
-  operator?: Operator,
-  value?: string | number | boolean | null | Array<string | number | boolean>
+  column?: string;
+  is_relational?: boolean;
+  is_nested?: boolean;
+  operation?: Operation;
+  operator?: Operator;
+  value?: string | number | boolean | null | Array<string | number | boolean>;
 }
 
-export interface ISelectRelation {
-  column?: string
-}
+
 
 export interface ISelectColumn {
-  column?: string
+  column?: string;
+  is_relational?: boolean;
+  is_nested?: boolean;
 }
 
 export interface IPage {
-  _start: number
-  _end: number
-  _sort: string
-  _order: SortDirection
+  _start: number;
+  _end: number;
+  _sort: string;
+  _order: SortDirection;
 }
-
 
 export interface ISortable {
   asKeyValue(): { [key: string]: string };
 }
 
 export interface IFindAllByPage {
-  repo: Repository<any>,
-  page: IPage,
-  queryDto?: Object,
-  customQuery?: IPageSearch[]
+  repo: Repository<any>;
+  page: IPage;
+  queryDto?: Object;
+  selectDto?: Object;
+  customQuery?: IPageSearch[];
 }
 
 export interface IFindOptionByPage {
-  page?: IPage,
-  queryDto?: Object,
-  customQuery?: IPageSearch[]
+  page?: IPage;
+  queryDto?: Object;
+  selectDto?: Object;
+  customQuery?: IPageSearch[];
 }
 
-
 export interface IFindOne {
-  id?: string | number
-  repo: Repository<any>,
-  queryDto?: Object,
-  customQuery?: IPageSearch[]
+  id?: string | number;
+  repo: Repository<any>;
+  queryDto?: Object;
+  selectDto?: Object;
+  customQuery?: IPageSearch[];
 }
 
 export interface IPageable {
   getSkip(): number;
   getTake(): number;
   getSort(): ISortable;
-  // next(totalElements: number): IPageable;
-  // previous(totalElements: number): IPageable;
 }

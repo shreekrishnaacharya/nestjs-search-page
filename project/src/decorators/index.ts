@@ -1,5 +1,5 @@
-import { IS_RELATIONAL, IS_SELECT, PAGE_SEARCH } from "../constants";
-import { IPageSearch, ISelectColumn, ISelectRelation } from "../interfaces";
+import { SK_IS_RELATIONAL, SK_IS_SELECT, SK_PAGE_SEARCH } from "../constants";
+import { IPageSearch, ISelectColumn } from "../interfaces";
 
 
 export function PageSearch(options?: IPageSearch) {
@@ -13,17 +13,7 @@ export function PageSearch(options?: IPageSearch) {
             value: null,
             ...options
         }
-        Reflect.defineMetadata(PAGE_SEARCH, optionsList, target, propertyKey);
-    };
-}
-
-export function SelectRelation(options?: ISelectRelation) {
-    return (target: any, propertyKey: string) => {
-        const optionsList: ISelectRelation = {
-            column: propertyKey,
-            ...options
-        }
-        Reflect.defineMetadata(IS_RELATIONAL, optionsList, target, propertyKey);
+        Reflect.defineMetadata(SK_PAGE_SEARCH, optionsList, target, propertyKey);
     };
 }
 
@@ -33,6 +23,6 @@ export function SelectColumn(options?: ISelectColumn) {
             column: propertyKey,
             ...options
         }
-        Reflect.defineMetadata(IS_SELECT, optionsList, target, propertyKey);
+        Reflect.defineMetadata(SK_IS_SELECT, optionsList, target, propertyKey);
     };
 }
