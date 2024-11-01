@@ -1,14 +1,15 @@
-import { PageSearch, SelectQuery } from "./decorators";
+import { PageSearch, PageSelect } from "./decorators";
 import { Page, findAllByPage, findOne, findOptions } from "./models";
-import { IPage, IPageSearch } from "./interfaces";
+import { IPage, IPageSearch, IPageSelect } from "./interfaces";
 
 export {
   PageSearch,
-  SelectQuery,
+  PageSelect,
   findAllByPage,
   findOne,
   findOptions,
   Page,
   IPage,
   IPageSearch,
+  IPageSelect,
 };
