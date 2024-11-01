@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Page = exports.findOptions = exports.findOne = exports.findAllByPage = exports.PageSearch = void 0;
+exports.Page = exports.findOptions = exports.findOne = exports.findAllByPage = exports.PageSelect = exports.PageSearch = void 0;
 const decorators_1 = require("./decorators");
 Object.defineProperty(exports, "PageSearch", { enumerable: true, get: function () { return decorators_1.PageSearch; } });
+Object.defineProperty(exports, "PageSelect", { enumerable: true, get: function () { return decorators_1.PageSelect; } });
 const models_1 = require("./models");
 Object.defineProperty(exports, "Page", { enumerable: true, get: function () { return models_1.Page; } });
 Object.defineProperty(exports, "findAllByPage", { enumerable: true, get: function () { return models_1.findAllByPage; } });

@@ -1,6 +1,6 @@
-export declare const IS_RELATIONAL = "IS_RELATIONAL";
-export declare const IS_SELECT = "IS_SELECT";
-export declare const PAGE_SEARCH = "PAGE_SEARCH";
+export declare const SK_IS_RELATIONAL = "SK_IS_RELATIONAL";
+export declare const SK_IS_SELECT = "SK_IS_SELECT";
+export declare const SK_PAGE_SEARCH = "SK_PAGE_SEARCH";
 export type Operation = "eq" | "neq" | "in" | "gt" | "gteq" | "lt" | "lteq" | "like" | "between";
 export type Operator = "and" | "or";
 export declare enum SortDirection {
