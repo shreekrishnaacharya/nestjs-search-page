@@ -10,9 +10,7 @@ export interface IPageSearch {
   value?: string | number | boolean | null | Array<string | number | boolean>;
 }
 
-
-
-export interface ISelectColumn {
+export interface IPageSelect {
   column?: string;
   is_relational?: boolean;
   is_nested?: boolean;

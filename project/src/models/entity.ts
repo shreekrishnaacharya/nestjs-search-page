@@ -22,7 +22,7 @@ import {
   IPage,
   IPageSearch,
   IPageable,
-  ISelectColumn,
+  IPageSelect,
 } from "../interfaces";
 import { PageRequest } from "./page-request.model";
 
@@ -66,7 +66,7 @@ export function findOptions<T>({
     selectDto == undefined
   ) {
     throw new Error(
-      "One of page|queryDto|selectDto|customQuery must be defined"
+      "One of (page|queryDto|selectDto|customQuery) must be defined"
     );
   }
   const pageable: IPageable = page ? PageRequest.from(page) : undefined;
@@ -75,7 +75,8 @@ export function findOptions<T>({
   const { where: whereRaw, relations } = _getMetaQuery(
     whereCondition,
     customQuery,
-    queryDto
+    queryDto,
+    selectDto
   );
   return {
     where: whereRaw as unknown as FindOptionsWhere<T>,
@@ -99,7 +100,9 @@ export async function findOne<T>({
     customQuery == undefined &&
     selectDto == undefined
   ) {
-    throw new Error("One of id|queryDto|selectDto|customQuery must be defined");
+    throw new Error(
+      "One of (id|queryDto|selectDto|customQuery) must be defined"
+    );
   }
   const cQ = customQuery ?? [];
   if (id) {
@@ -173,9 +176,8 @@ function _getMetaQuery(
       }
       if (selectQuery.is_relational) {
         relational = _buildRelation(relational, selectQuery);
-      } else {
-        selection = _buildSelect(selection, selectQuery);
       }
+      selection = _buildSelect(selection, selectQuery);
     }
   }
   conditions?.forEach((pageSearch: IPageSearch) => {
@@ -249,7 +251,7 @@ function _buildRelation(relational: object, pageSearch: IPageSearch) {
   return relational;
 }
 
-function _buildSelect(select: object, selectQuery: ISelectColumn) {
+function _buildSelect(select: object, selectQuery: IPageSelect) {
   const { column, is_nested } = selectQuery;
   if (!column) {
     return select;
@@ -316,4 +318,6 @@ function _switchContition(operation: Operation, value: any) {
     default:
       return value;
   }
+
+  function _buildColumnSelect() {}
 }
