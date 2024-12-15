@@ -11,9 +11,8 @@ export interface IPageSearch {
 }
 
 export interface IPageSelect {
-  column?: string;
-  is_relational?: boolean;
-  is_nested?: boolean;
+  select: object | string;
+  type?: "relational" | "default";
 }
 
 export interface IPage {

@@ -4,7 +4,8 @@ import { IPageSelect } from "../interfaces";
 export function PageSelect(options?: IPageSelect) {
   return (target: any, propertyKey: string) => {
     const optionsList: IPageSelect = {
-      column: propertyKey,
+      select: propertyKey,
+      type: "default",
       ...options,
     };
     Reflect.defineMetadata(SK_IS_SELECT, optionsList, target, propertyKey);

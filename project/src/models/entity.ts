@@ -71,14 +71,14 @@ export function findOptions<T>({
   }
   const pageable: IPageable = page ? PageRequest.from(page) : undefined;
   let whereCondition = { and: [], or: [] } as TWhere;
-  const sort: { [key: string]: string } = pageable.getSort()?.asKeyValue();
-  const { where: whereRaw, relations } = _getMetaQuery(
-    whereCondition,
-    customQuery,
-    queryDto,
-    selectDto
-  );
+  const sort: { [key: string]: string } = pageable?.getSort()?.asKeyValue();
+  const {
+    where: whereRaw,
+    relations,
+    select,
+  } = _getMetaQuery(whereCondition, customQuery, queryDto, selectDto);
   return {
+    select,
     where: whereRaw as unknown as FindOptionsWhere<T>,
     order: sort as unknown as FindOptionsOrder<T>,
     relations: relations,
@@ -130,11 +130,11 @@ async function _generatePageResult<T>(
 
 function _getMetaQuery(
   whereConditions: TWhere,
-  conditions?: IPageSearch[],
+  conditions?: Array<IPageSearch | IPageSearch>,
   whereQuery?: Object,
   selectDto?: Object
 ): IBuildReturn {
-  let relational = {};
+  let relational: string[] = [];
   let selection = {};
   for (const key in whereQuery) {
     const pageSearch: IPageSearch = Reflect.getMetadata(
@@ -146,50 +146,49 @@ function _getMetaQuery(
       if (pageSearch.column?.includes(".")) {
         pageSearch.is_nested = pageSearch?.is_nested ?? true;
       }
-      pageSearch.value = whereQuery[key];
-      if (
-        ((pageSearch.value === true || pageSearch.value === "true") &&
-          pageSearch.is_relational === null) ||
-        pageSearch.is_relational === true
-      ) {
-        relational = _buildRelation(relational, pageSearch);
+      if (pageSearch.is_relational) {
+        _buildRelation(selection, relational, pageSearch);
         continue;
       }
+      pageSearch.value = whereQuery[key];
       if (pageSearch.value.toString() == "") {
         continue;
       }
       _buildWhere(pageSearch, whereConditions);
+    } else {
+      const selectQuery: IPageSelect = Reflect.getMetadata(
+        SK_IS_SELECT,
+        whereQuery,
+        key
+      );
+      if (selectQuery) {
+        if (whereQuery[key] != true) {
+          continue;
+        }
+        _buildSelect(selection, relational, selectQuery);
+      }
     }
   }
   for (const skey in selectDto) {
-    const selectQuery: IPageSearch = Reflect.getMetadata(
-      SK_PAGE_SEARCH,
-      whereQuery,
+    const selectQuery: IPageSelect = Reflect.getMetadata(
+      SK_IS_SELECT,
+      selectDto,
       skey
     );
     if (selectQuery) {
-      if (selectQuery.column?.includes(".")) {
-        selectQuery.is_nested = selectQuery?.is_nested ?? true;
+      if (selectDto[skey] != true) {
+        continue;
       }
-      if (selectQuery.is_nested) {
-        selectQuery.is_relational = true;
-      }
-      if (selectQuery.is_relational) {
-        relational = _buildRelation(relational, selectQuery);
-      }
-      selection = _buildSelect(selection, selectQuery);
+      _buildSelect(selection, relational, selectQuery);
     }
   }
-  conditions?.forEach((pageSearch: IPageSearch) => {
-    if (pageSearch.column?.includes(".")) {
-      pageSearch.is_nested = pageSearch?.is_nested ?? true;
-    }
-    if (
-      (pageSearch.value === true && pageSearch.is_relational !== false) ||
-      pageSearch.is_relational === true
-    ) {
-      relational = _buildRelation(relational, pageSearch);
+  conditions?.forEach((pageSearch: IPageSearch | IPageSelect) => {
+    if ("select" in pageSearch) {
+      _buildSelect(selection, relational, pageSearch);
     } else {
+      if (pageSearch.column?.includes(".")) {
+        pageSearch.is_nested = pageSearch?.is_nested ?? true;
+      }
       _buildWhere(pageSearch, whereConditions);
     }
   });
@@ -216,57 +215,42 @@ function _getMetaQuery(
       return { ...element, ...andWhere };
     });
   }
-
+  if (Object.keys(selection).length > 0) {
+    selection["id"] = true;
+  } else {
+    selection = undefined;
+  }
   return {
     where: [...whereArray],
-    relations: { ...relational },
+    relations: [...relational],
     select: { ...selection },
   };
 }
 
-function _recursiveNestedObject(column: Array<string>, value: any) {
-  if (column.length == 1) {
-    const [key] = column;
-    return { [key]: value };
-  }
-  const [key, ...rest] = column;
-  return { [key]: _recursiveNestedObject(rest, value) };
-}
-
-function _buildRelation(relational: object, pageSearch: IPageSearch) {
+function _buildRelation(
+  selection: object,
+  relational: string[],
+  pageSearch: IPageSearch
+) {
   const { column, is_nested } = pageSearch;
   if (!column) {
     return relational;
   }
-  if (is_nested) {
-    const nested = _recursiveNestedObject(column.split("."), true);
-    relational = {
-      ...relational,
-      ...nested,
-    };
-  } else {
-    relational[column] = true;
-  }
-
+  _transformData(selection, relational, column, "relational");
   return relational;
 }
 
-function _buildSelect(select: object, selectQuery: IPageSelect) {
-  const { column, is_nested } = selectQuery;
-  if (!column) {
-    return select;
+function _buildSelect(
+  selectGlobal: object,
+  relational: string[],
+  selectQuery: IPageSelect
+) {
+  const { select, type } = selectQuery;
+  if (!select) {
+    return { select: selectGlobal, relational };
   }
-  if (is_nested) {
-    const nested = _recursiveNestedObject(column.split("."), true);
-    select = {
-      ...select,
-      ...nested,
-    };
-  } else {
-    select[column] = true;
-  }
-
-  return select;
+  _transformData(selectGlobal, relational, select, type);
+  return { select: selectGlobal, relation: relational };
 }
 
 function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
@@ -289,15 +273,15 @@ function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
   }
   if (is_nested) {
     const nested = column.split(".");
-    const nestValue = _switchContition(operation ?? "like", value);
+    const nestValue = _switchCondition(operation ?? "like", value);
     cond = _recursiveNestedObject(nested, nestValue);
   } else {
-    cond[column] = _switchContition(operation ?? "like", value);
+    cond[column] = _switchCondition(operation ?? "like", value);
   }
   whereConditions[operator ?? "or"].push(cond);
 }
 
-function _switchContition(operation: Operation, value: any) {
+function _switchCondition(operation: Operation, value: any) {
   switch (operation) {
     case "gt":
       return MoreThan(value);
@@ -318,6 +302,58 @@ function _switchContition(operation: Operation, value: any) {
     default:
       return value;
   }
+}
 
-  function _buildColumnSelect() {}
+function _transformData(
+  selection: any,
+  relational: any[],
+  select: string | object,
+  type: "relational" | "default",
+  value: any = true
+) {
+  if (typeof select === "string") {
+    if (type == "relational") {
+      relational.push(select);
+      return { selection, relational };
+    }
+    const keys = select.split(".");
+    const relatable = [...keys];
+    relatable.pop();
+    let current = selection;
+
+    keys.forEach((key, index) => {
+      if (index === keys.length - 1) {
+        if (relatable.length) {
+          relational.push(relatable.join("."));
+        }
+        current[key] = value; // Add value to selection
+      } else {
+        current[key] = current[key] || {}; // Ensure intermediate object
+        current = current[key];
+      }
+    });
+  } else if (typeof select === "object") {
+    Object.entries(select).forEach(([key, nestedValue]) => {
+      if (type === "default") {
+        selection[key] = selection[key] || {}; // Ensure intermediate object exists
+        _transformData(selection[key], relational, nestedValue, type, value); // Recursive call
+      } else if (type === "relational") {
+        const relationPath = Object.keys(nestedValue)
+          .map((nestedKey) => `${key}.${nestedKey}`)
+          .join(".");
+        relational.push(relationPath); // Add nested relation path
+      }
+    });
+  }
+
+  return { selection, relational };
+}
+
+function _recursiveNestedObject(column: Array<string>, value: any) {
+  if (column.length == 1) {
+    const [key] = column;
+    return { [key]: value };
+  }
+  const [key, ...rest] = column;
+  return { [key]: _recursiveNestedObject(rest, value) };
 }
