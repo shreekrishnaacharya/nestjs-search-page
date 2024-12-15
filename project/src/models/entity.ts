@@ -176,7 +176,7 @@ function _getMetaQuery(
       skey
     );
     if (selectQuery) {
-      if (selectDto[skey] != true) {
+      if (selectDto[skey] != true || selectDto[skey] != "true") {
         continue;
       }
       _buildSelect(selection, relational, selectQuery);
