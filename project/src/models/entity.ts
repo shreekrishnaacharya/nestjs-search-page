@@ -11,6 +11,7 @@ import {
   Not,
   In,
   Between,
+  Raw,
 } from "typeorm";
 
 import { Page } from "../models/page.model";
@@ -289,8 +290,16 @@ function _switchCondition(operation: Operation, value: any) {
       return MoreThanOrEqual(value);
     case "in":
       return In(value);
+    case "notIn":
+      return Not(In(value));
+    case "isNull":
+      return Raw((alias) => `${alias} IS NULL`);
+    case "isNotNull":
+        return Raw((alias) => `${alias} IS NOT NULL`);
     case "like":
       return Like(`%${value}%`);
+      case "notLike":
+        return Not(Like(`%${value}%`));
     case "lt":
       return LessThan(value);
     case "lteq":
