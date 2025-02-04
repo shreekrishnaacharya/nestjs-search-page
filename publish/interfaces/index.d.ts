@@ -9,9 +9,8 @@ export interface IPageSearch {
     value?: string | number | boolean | null | Array<string | number | boolean>;
 }
 export interface IPageSelect {
-    column?: string;
-    is_relational?: boolean;
-    is_nested?: boolean;
+    select: object | string;
+    type?: "relational" | "default";
 }
 export interface IPage {
     _start: number;
