@@ -295,11 +295,11 @@ function _switchCondition(operation: Operation, value: any) {
     case "isNull":
       return Raw((alias) => `${alias} IS NULL`);
     case "isNotNull":
-        return Raw((alias) => `${alias} IS NOT NULL`);
+      return Raw((alias) => `${alias} IS NOT NULL`);
     case "like":
       return Like(`%${value}%`);
-      case "notLike":
-        return Not(Like(`%${value}%`));
+    case "notLike":
+      return Not(Like(`%${value}%`));
     case "lt":
       return LessThan(value);
     case "lteq":
