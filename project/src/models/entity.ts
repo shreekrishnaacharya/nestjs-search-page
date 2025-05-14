@@ -198,22 +198,11 @@ function _getMetaQuery(
     whereArray.push(element);
   });
   if (whereArray.length == 0) {
-    whereConditions.and.forEach((ele, i) => {
-      whereArray[0] = {
-        ...whereArray[0],
-        ...ele,
-      };
-    });
+    whereArray[0] = _mergeArrayObjects(whereConditions.and);
   } else if (whereConditions.and.length > 0) {
-    let andWhere = {};
-    whereConditions.and.forEach((ele, i) => {
-      andWhere = {
-        ...andWhere,
-        ...ele,
-      };
-    });
+    let andWhere = _mergeArrayObjects(whereConditions.and);
     whereArray = whereArray.map((element, i) => {
-      return { ...element, ...andWhere };
+      return _deepMerge(element, andWhere);
     });
   }
   if (Object.keys(selection).length > 0) {
@@ -263,7 +252,14 @@ function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
   if (!operation && Array.isArray(value)) {
     operation = "in";
   }
-  if (operation == "in" && !Array.isArray(value)) {
+
+  if (
+    operation == "in" &&
+    typeof value == "string" &&
+    Array.isArray(value.split(","))
+  ) {
+    value = value.split(",");
+  } else if (operation == "in" && !Array.isArray(value)) {
     value = [value];
   }
   if (operation == "between" && !Array.isArray(value)) {
@@ -365,4 +361,29 @@ function _recursiveNestedObject(column: Array<string>, value: any) {
   }
   const [key, ...rest] = column;
   return { [key]: _recursiveNestedObject(rest, value) };
+}
+
+function _isObject(item: any): item is Record<string, any> {
+  return item && typeof item === "object" && !Array.isArray(item);
+}
+
+function _deepMerge(target: any, source: any): any {
+  const result = { ...target };
+
+  for (const key in source) {
+    if (_isObject(source[key])) {
+      if (!(key in result)) {
+        result[key] = source[key];
+      } else {
+        result[key] = _deepMerge(result[key], source[key]);
+      }
+    } else {
+      result[key] = source[key];
+    }
+  }
+  return result;
+}
+
+function _mergeArrayObjects(arr: any[]): any {
+  return arr.reduce((acc, curr) => _deepMerge(acc, curr), {});
 }
