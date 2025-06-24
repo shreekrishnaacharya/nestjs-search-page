@@ -12,10 +12,12 @@ export type Operation =
   | "lteq"
   | "like"
   | "between"
+  | "notBetween"
   | "isNull"
   | "isNotNull"
   | "notLike"
-  | "notIn";
+  | "notIn"
+  | "raw";
 
 export type Operator = "and" | "or";
 

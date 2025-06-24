@@ -10,4 +10,5 @@ export declare class Sort implements ISortable {
         [key: string]: string;
     };
     static from(column: string, direction: SortDirection): ISortable;
+    private setNestedValue;
 }

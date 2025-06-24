@@ -94,7 +94,8 @@ function _getMetaQuery(whereConditions, conditions, whereQuery, selectDto) {
                 _buildRelation(selection, relational, pageSearch);
                 continue;
             }
-            pageSearch.value = whereQuery[key];
+            pageSearch.value =
+                pageSearch.operation == "raw" ? pageSearch.value : whereQuery[key];
             if (pageSearch.value.toString() == "") {
                 continue;
             }
@@ -136,17 +137,12 @@ function _getMetaQuery(whereConditions, conditions, whereQuery, selectDto) {
         whereArray.push(element);
     });
     if (whereArray.length == 0) {
-        whereConditions.and.forEach((ele, i) => {
-            whereArray[0] = Object.assign(Object.assign({}, whereArray[0]), ele);
-        });
+        whereArray[0] = _mergeArrayObjects(whereConditions.and);
     }
     else if (whereConditions.and.length > 0) {
-        let andWhere = {};
-        whereConditions.and.forEach((ele, i) => {
-            andWhere = Object.assign(Object.assign({}, andWhere), ele);
-        });
+        let andWhere = _mergeArrayObjects(whereConditions.and);
         whereArray = whereArray.map((element, i) => {
-            return Object.assign(Object.assign({}, element), andWhere);
+            return _deepMerge(element, andWhere);
         });
     }
     if (Object.keys(selection).length > 0) {
@@ -186,7 +182,12 @@ function _buildWhere(pageSearch, whereConditions) {
     if (!operation && Array.isArray(value)) {
         operation = "in";
     }
-    if (operation == "in" && !Array.isArray(value)) {
+    if (operation == "in" &&
+        typeof value == "string" &&
+        Array.isArray(value.split(","))) {
+        value = value.split(",");
+    }
+    else if (operation == "in" && !Array.isArray(value)) {
         value = [value];
     }
     if (operation == "between" && !Array.isArray(value)) {
@@ -231,6 +232,10 @@ function _switchCondition(operation, value) {
             return (0, typeorm_1.Not)((0, typeorm_1.Equal)(value));
         case "between":
             return (0, typeorm_1.Between)(value[0], value[1]);
+        case "notBetween":
+            return (0, typeorm_1.Not)((0, typeorm_1.Between)(value[0], value[1]));
+        case "raw":
+            return (0, typeorm_1.Raw)(() => value);
         default:
             return value;
     }
@@ -281,4 +286,27 @@ function _recursiveNestedObject(column, value) {
     }
     const [key, ...rest] = column;
     return { [key]: _recursiveNestedObject(rest, value) };
+}
+function _isObject(item) {
+    return item && typeof item === "object" && !Array.isArray(item);
+}
+function _deepMerge(target, source) {
+    const result = Object.assign({}, target);
+    for (const key in source) {
+        if (_isObject(source[key])) {
+            if (!(key in result)) {
+                result[key] = source[key];
+            }
+            else {
+                result[key] = _deepMerge(result[key], source[key]);
+            }
+        }
+        else {
+            result[key] = source[key];
+        }
+    }
+    return result;
+}
+function _mergeArrayObjects(arr) {
+    return arr.reduce((acc, curr) => _deepMerge(acc, curr), {});
 }

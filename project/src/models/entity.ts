@@ -151,7 +151,8 @@ function _getMetaQuery(
         _buildRelation(selection, relational, pageSearch);
         continue;
       }
-      pageSearch.value = whereQuery[key];
+      pageSearch.value =
+        pageSearch.operation == "raw" ? pageSearch.value : whereQuery[key];
       if (pageSearch.value.toString() == "") {
         continue;
       }
@@ -304,6 +305,10 @@ function _switchCondition(operation: Operation, value: any) {
       return Not(Equal(value));
     case "between":
       return Between(value[0], value[1]);
+    case "notBetween":
+      return Not(Between(value[0], value[1]));
+    case "raw":
+      return Raw(() => value);
     default:
       return value;
   }

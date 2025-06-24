@@ -4,6 +4,20 @@ exports.Sort = void 0;
 const constants_1 = require("../constants");
 class Sort {
     constructor(column = "id", direction = constants_1.SortDirection.DESC) {
+        this.setNestedValue = (obj, keys, value) => {
+            const key = keys.shift();
+            if (!key)
+                return;
+            if (!obj[key]) {
+                obj[key] = keys.length > 0 ? {} : value;
+            }
+            if (keys.length > 0) {
+                this.setNestedValue(obj[key], keys, value);
+            }
+            else {
+                obj[key] = value;
+            }
+        };
         this.direction = direction;
         this.column = column;
     }
@@ -20,16 +34,8 @@ class Sort {
         for (let i = 0; i < sort.length; i++) {
             const key = sort[i];
             const value = direction[i];
-            if (key.includes(".")) {
-                const [parent, child] = key.split(".");
-                if (!result[parent]) {
-                    result[parent] = {};
-                }
-                result[parent][child] = value;
-            }
-            else {
-                result[key] = value;
-            }
+            const keyParts = key.split(".");
+            this.setNestedValue(result, keyParts, value);
         }
         return result;
     }
