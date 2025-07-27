@@ -6,7 +6,7 @@ export interface IPageSearch {
     is_nested?: boolean;
     operation?: Operation;
     operator?: Operator;
-    value?: string | number | boolean | null | Array<string | number | boolean>;
+    value?: string | number | boolean | null | Array<string | number | boolean> | Function;
 }
 export interface IPageSelect {
     select: object | string;
