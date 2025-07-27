@@ -151,9 +151,14 @@ function _getMetaQuery(
         _buildRelation(selection, relational, pageSearch);
         continue;
       }
-      pageSearch.value =
-        pageSearch.operation == "raw" ? pageSearch.value : whereQuery[key];
-      if (pageSearch.value.toString() == "") {
+      if (pageSearch.operation == "raw") {
+        if (typeof pageSearch.value === "function") {
+          pageSearch.value = pageSearch.value(whereQuery[key]);
+        }
+      } else {
+        pageSearch.value = whereQuery[key];
+      }
+      if (pageSearch.value == undefined || pageSearch.value.toString() == "") {
         continue;
       }
       _buildWhere(pageSearch, whereConditions);
@@ -260,7 +265,11 @@ function _buildWhere(pageSearch: IPageSearch, whereConditions: TWhere) {
     Array.isArray(value.split(","))
   ) {
     value = value.split(",");
-  } else if (operation == "in" && !Array.isArray(value)) {
+  } else if (
+    operation == "in" &&
+    !Array.isArray(value) &&
+    typeof value != "function"
+  ) {
     value = [value];
   }
   if (operation == "between" && !Array.isArray(value)) {
