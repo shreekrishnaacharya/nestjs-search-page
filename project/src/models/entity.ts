@@ -138,11 +138,9 @@ function _getMetaQuery(
   let relational: string[] = [];
   let selection = {};
   for (const key in whereQuery) {
-    const pageSearch: IPageSearch = Reflect.getMetadata(
-      SK_PAGE_SEARCH,
-      whereQuery,
-      key
-    );
+    const pageSearch: IPageSearch = {
+      ...Reflect.getMetadata(SK_PAGE_SEARCH, whereQuery, key),
+    };
     if (pageSearch) {
       if (pageSearch.column?.includes(".")) {
         pageSearch.is_nested = pageSearch?.is_nested ?? true;
